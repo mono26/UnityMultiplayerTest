@@ -7,6 +7,9 @@ namespace SLGFramework
         private bool isInitialized = false;
         private bool isPlaying = false;
 
+        /// <summary>
+        /// Should be called in the Awake(). Better used for catching references, and stuff needed before start playing.
+        /// </summary>
         public void Initialize()
         {
             if (this.isInitialized) {
@@ -18,6 +21,9 @@ namespace SLGFramework
             this.isInitialized = true;
         }
 
+        /// <summary>
+        /// Should be called in the Start(). Better used for initializing everything to start playing.
+        /// </summary>
         public void BeginPlay()
         {
             if (this.isPlaying) {

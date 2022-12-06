@@ -16,6 +16,7 @@ namespace MultiplayerTest
             base.OnInitialize();
 
             this.appReference = new GameApp();
+            this.appReference.Initialize();
         }
 
         protected override void OnBeginPlay()

@@ -1,10 +1,15 @@
-using Photon.Pun;
-using Photon.Realtime;
+//using Photon.Pun;
+//using Photon.Realtime;
+using Fusion;
+using Fusion.Sockets;
+using SLGFramework;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerTest
 {
-    public class GameServer : PUNSingleton<GameServer>
+    public class GameServer : Singleton<GameServer>, INetworkRunnerCallbacks
     {
         /// <summary>
         /// The maximum number of players per room. When a room is full, it can't be joined by new players, and so new room will be created.
@@ -12,14 +17,6 @@ namespace MultiplayerTest
         [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players, and so new room will be created")]
         [SerializeField]
         private byte maxPlayersPerRoom = 4;
-
-        // TODO remove this.
-        [Tooltip("The Ui Panel to let the user enter name, connect and play")]
-        [SerializeField]
-        private GameObject controlPanel;
-        [Tooltip("The UI Label to inform the user that the connection is in progress")]
-        [SerializeField]
-        private GameObject progressLabel;
 
         private bool isConnecting = false;
 
@@ -29,7 +26,8 @@ namespace MultiplayerTest
         {
             base.OnInitialize();
 
-            PhotonNetwork.AutomaticallySyncScene = true;
+            NetworkRunner networkRunner = this.GetComponent<NetworkRunner>();
+            networkRunner.AddCallbacks(this);
         }
 
         protected override void OnBeginPlay()
@@ -38,68 +36,110 @@ namespace MultiplayerTest
 
             Debug.Log("OnBeginPlay");
 
-            // this.ConnectToServer();
-
-            this.progressLabel.SetActive(false);
-            this.controlPanel.SetActive(true);
+            // this.ConnectToNetwork();
 
             GameRunner.Instance.Initialize();
         }
 
-        public override void OnConnectedToMaster()
-        {
-            Debug.Log("PUN Basics Tutorial/Launcher: OnConnectedToMaster() was called by PUN");
-
-            if (this.isConnecting) {
-                this.CreateRoom();
-            }
-        }
-
-
-        public override void OnDisconnected(DisconnectCause cause)
-        {
-            Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
-
-            this.isConnecting = false;
-
-            this.progressLabel.SetActive(false);
-            this.controlPanel.SetActive(true);
-        }
-
-        public override void OnJoinRandomFailed(short returnCode, string message)
-        {
-            Debug.Log("PUN Basics Tutorial/Launcher:OnJoinRandomFailed() was called by PUN. No random room available. Server shouldn't join a random room.");
-        }
-
-        public override void OnJoinedRoom()
-        {
-            Debug.Log("PUN Basics Tutorial/Launcher: OnJoinedRoom() called by PUN. Now this server is in a room.");
-
-            this.isConnecting = false;
-        }
-
         private void CreateRoom()
         {
-            PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = this.maxPlayersPerRoom });
+            // PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = this.maxPlayersPerRoom });
         }
 
-        public void ConnectToServer()
+        public void ConnectToNetwork()
         {
-            this.progressLabel.SetActive(true);
-            this.controlPanel.SetActive(false);
-
-            if (PhotonNetwork.IsConnected) {
-                this.CreateRoom();
-            }
-            else {
-                this.isConnecting = PhotonNetwork.ConnectUsingSettings();
-                PhotonNetwork.GameVersion = this.appReference.AppVersion;
-            }
+            //if (PhotonNetwork.IsConnected) {
+            //    this.CreateRoom();
+            //}
+            //else {
+            //    this.isConnecting = PhotonNetwork.ConnectUsingSettings();
+            //    PhotonNetwork.GameVersion = this.appReference.AppVersion;
+            //}
         }
 
         public void SetAppReference(GameApp app)
         {
             this.appReference = app;
+        }
+
+        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+        {
+            
+        }
+
+        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+        {
+            
+        }
+
+        public void OnInput(NetworkRunner runner, NetworkInput input)
+        {
+            
+        }
+
+        public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
+        {
+            
+        }
+
+        public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
+        {
+            
+        }
+
+        public void OnConnectedToServer(NetworkRunner runner)
+        {
+            
+        }
+
+        public void OnDisconnectedFromServer(NetworkRunner runner)
+        {
+            
+        }
+
+        public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
+        {
+            
+        }
+
+        public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
+        {
+            
+        }
+
+        public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
+        {
+            
+        }
+
+        public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+        {
+            
+        }
+
+        public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
+        {
+            
+        }
+
+        public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
+        {
+            
+        }
+
+        public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data)
+        {
+            
+        }
+
+        public void OnSceneLoadDone(NetworkRunner runner)
+        {
+            
+        }
+
+        public void OnSceneLoadStart(NetworkRunner runner)
+        {
+            
         }
     }
 }

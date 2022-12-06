@@ -1,4 +1,4 @@
-using Photon.Pun;
+//using Photon.Pun;
 using SLGFramework;
 using TMPro;
 using UnityEngine;
@@ -28,7 +28,7 @@ namespace MultiplayerTest
                 }
             }
 
-            PhotonNetwork.NickName = defaultName;
+            //PhotonNetwork.NickName = defaultName;
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace MultiplayerTest
                 Debug.LogError("Player Name is null or empty");
                 return;
             }
-            PhotonNetwork.NickName = value;
+            //PhotonNetwork.NickName = value;
 
 
             PlayerPrefs.SetString(playerNamePrefKey, value);

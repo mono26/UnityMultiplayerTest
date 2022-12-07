@@ -150,8 +150,7 @@ namespace MultiplayerTest
         {
             this.networkRunner.StartGame(new StartGameArgs() {
                 GameMode = GameMode.Client,
-                SessionName = "TestRoom",
-                Scene = SceneManager.GetActiveScene().buildIndex,
+                SessionName = "localhost",
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
             });
         }

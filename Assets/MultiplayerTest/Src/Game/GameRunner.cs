@@ -30,7 +30,7 @@ namespace MultiplayerTest
             // TODO remove this.
             // TODO create transition manager.
             // SceneManager.LoadScene("LobbyScene");
-            SceneManager.LoadScene("Playground");
+            // SceneManager.LoadScene("Playground");
         }
 
         public void LeaveRoom()

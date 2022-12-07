@@ -14,9 +14,15 @@ namespace SLGFramework
                 if (instance == null) {
                     instance = GameObject.FindObjectOfType<T>();
                     if (instance == null) {
-                        GameObject singletonObj = new GameObject();
-                        singletonObj.name = typeof(T).Name;
-                        instance = singletonObj.AddComponent<T>();
+                        T resource = Resources.Load<T>($"PFB_{typeof(T).Name}");
+                        if (resource != null) {
+                            instance = GameObject.Instantiate(resource);
+                        }
+                        else {
+                            GameObject singletonObj = new GameObject();
+                            singletonObj.name = typeof(T).Name;
+                            instance = singletonObj.AddComponent<T>();
+                        }
                     }
                 }
                 return instance;

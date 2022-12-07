@@ -7,7 +7,6 @@ namespace SLGFramework
 {
     public class ServerConfig
     {
-
         public string SessionName { get; private set; } = "localhost";
         public string Region { get; private set; }
         public string Lobby { get; private set; }

@@ -6,21 +6,12 @@ using SLGFramework;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace MultiplayerTest
 {
     public class GameServer : Singleton<GameServer>, INetworkRunnerCallbacks
     {
-        /// <summary>
-        /// The maximum number of players per room. When a room is full, it can't be joined by new players, and so new room will be created.
-        /// </summary>
-        [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players, and so new room will be created")]
-        [SerializeField]
-        private byte maxPlayersPerRoom = 4;
-
         [SerializeField]
         private NetworkPrefabRef playerPrefab;
 
@@ -31,6 +22,8 @@ namespace MultiplayerTest
         private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
         private GameApp appReference = null;
+
+        private ServerConfig serverConfig = null;
 
         private void Start()
         {
@@ -103,10 +96,7 @@ namespace MultiplayerTest
 
         public void OnConnectedToServer(NetworkRunner runner)
         {
-            Debug.LogError("OnConnectedToServer");
-
-            // Initialize the instance in charge of handling game logic.
-            GameRunner.Instance.Initialize();
+            Debug.Log("OnConnectedToServer");
         }
 
         public void OnDisconnectedFromServer(NetworkRunner runner)
@@ -173,46 +163,62 @@ namespace MultiplayerTest
             spawnedCharacters.Add(player, networkPlayerObject);
         }
 
-        public void ConnectToNetwork()
+        public async void ConnectToNetwork()
         {
-            //this.networkRunner.StartGame(new StartGameArgs() {
-            //    GameMode = GameMode.Host,
-            //    SessionName = "TestRoom",
-            //    Scene = SceneManager.GetActiveScene().buildIndex,
-            //    SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
-            //});
+            Debug.Log("Attempting to create server.");
+
+            this.serverConfig = ServerConfig.Resolve();
 
             // Build Custom Photon Config
-            var photonSettings = PhotonAppSettings.Instance.AppSettings.GetCopy();
+            AppSettings photonSettings = PhotonAppSettings.Instance.AppSettings.GetCopy();
 
-            if (string.IsNullOrEmpty(customRegion) == false) {
-                photonSettings.FixedRegion = customRegion.ToLower();
+            if (string.IsNullOrEmpty(this.serverConfig.Region) == false) {
+                photonSettings.FixedRegion = this.serverConfig.Region.ToLower();
             }
 
             // Build Custom External Addr
             NetAddress? externalAddr = null;
 
-            if (string.IsNullOrEmpty(customPublicIP) == false && customPublicPort > 0) {
-                if (IPAddress.TryParse(customPublicIP, out var _)) {
-                    externalAddr = NetAddress.CreateFromIpPort(customPublicIP, customPublicPort);
+            if (string.IsNullOrEmpty(this.serverConfig.PublicIP) == false && this.serverConfig.PublicPort > 0) {
+                if (IPAddress.TryParse(this.serverConfig.PublicIP, out var _)) {
+                    externalAddr = NetAddress.CreateFromIpPort(this.serverConfig.PublicIP, this.serverConfig.PublicPort);
                 }
                 else {
                     Log.Warn("Unable to parse 'Custom Public IP'");
                 }
             }
 
+            this.isConnecting = true;
+
             // Start Runner
-            return this.networkRunner.StartGame(new StartGameArgs() {
-                SessionName = SessionName,
+            StartGameResult result = await this.networkRunner.StartGame(new StartGameArgs() {
+                SessionName = this.serverConfig.SessionName,
                 GameMode = GameMode.Server,
                 SceneManager = this.networkRunner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
-                Scene = 0,
-                SessionProperties = customProps,
-                Address = NetAddress.Any(port),
+                Scene = 2,
+                SessionProperties = this.serverConfig.SessionProperties,
+                Address = NetAddress.CreateFromIpPort("127.0.0.1", this.serverConfig.Port),
                 CustomPublicAddress = externalAddr,
-                CustomLobbyName = customLobby,
+                CustomLobbyName = this.serverConfig.Lobby,
                 CustomPhotonAppSettings = photonSettings,
             });
+
+            if (result.Ok) {
+                Log.Debug($"Runner Start DONE");
+
+                this.isConnecting = false;
+
+                // Initialize the instance in charge of handling game logic.
+                GameRunner.Instance.Initialize();
+            }
+            else {
+                // Quit the application if startup fails
+                Log.Debug($"Error while starting Server: {result.ShutdownReason}");
+
+                // it can be used any error code that can be read by an external application
+                // using 0 means all went fine
+                Application.Quit(1);
+            }
         }
 
         public void SetAppReference(GameApp app)

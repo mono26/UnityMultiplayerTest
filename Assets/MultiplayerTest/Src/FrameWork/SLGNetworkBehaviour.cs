@@ -1,8 +1,8 @@
-using UnityEngine;
+using Fusion;
 
-namespace SLGFramework
+namespace MultiplayerTest
 {
-    public abstract class SLGBehaviour : MonoBehaviour
+    public abstract class SLGNetworkBehaviour : NetworkBehaviour
     {
         private bool isInitialized = false;
         private bool isPlaying = false;
@@ -39,3 +39,4 @@ namespace SLGFramework
         protected virtual void OnInitialize() { }
     }
 }
+

@@ -8,9 +8,6 @@ namespace MultiplayerTest
     [RequireComponent(typeof(Button))]
     public class PlayGameButton : SLGBehaviour
     {
-        [SerializeField]
-        private GameMode gameMode = GameMode.Host;
-
         private void Awake()
         {
             this.Initialize();
@@ -26,7 +23,9 @@ namespace MultiplayerTest
 
         private void OnButtonTriggered()
         {
-            GameClient.Instance.ConnectToRoom(this.gameMode);
+#if GAME_CLIENT
+            GameClient.Instance.ConnectToRoom();
+#endif
         }
     }
 }

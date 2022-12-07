@@ -15,14 +15,6 @@ namespace MultiplayerTest
         private void LoadLevel()
         {
             // TODO server should be the only one to load levels.
-
-            //if (!PhotonNetwork.IsMasterClient) {
-            //    Debug.LogError("PhotonNetwork : Trying to Load a level but we are not the master Client");
-            //    return;
-            //}
-
-            Debug.LogFormat("PhotonNetwork : Players count : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
-            // PhotonNetwork.LoadLevel(PhotonNetwork.CurrentRoom.PlayerCount > 0 ? "Playground" : "LobbyScene");
         }
 #endif
 
@@ -35,9 +27,10 @@ namespace MultiplayerTest
         {
             base.OnBeginPlay();
 
+            // TODO remove this.
             // TODO create transition manager.
             // SceneManager.LoadScene("LobbyScene");
-            // SceneManager.LoadScene("Playground");
+            SceneManager.LoadScene("Playground");
         }
 
         public void LeaveRoom()

@@ -102,7 +102,10 @@ namespace StarterAssets
         private PlayerInput _playerInput;
 #endif
         private Animator _animator;
-        private CharacterController _controller;
+
+        // private CharacterController _controller;
+        private NetworkCharacterControllerPrototype _controller;
+
         private StarterAssetsInputs _input;
         private GameObject _mainCamera;
 
@@ -137,7 +140,10 @@ namespace StarterAssets
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
             
             _hasAnimator = TryGetComponent(out _animator) || this.transform.GetChild(0).TryGetComponent(out _animator);
-            _controller = GetComponent<CharacterController>();
+
+            // _controller = GetComponent<CharacterController>();
+            _controller = GetComponent<NetworkCharacterControllerPrototype>();
+
             _input = GetComponent<StarterAssetsInputs>();
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
             _playerInput = GetComponent<PlayerInput>();
@@ -223,7 +229,8 @@ namespace StarterAssets
             if (_input.move == Vector2.zero) targetSpeed = 0.0f;
 
             // a reference to the players current horizontal velocity
-            float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
+            // float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
+            float currentHorizontalSpeed = new Vector3(_controller.Velocity.x, 0.0f, _controller.Velocity.z).magnitude;
 
             float speedOffset = 0.1f;
             float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
@@ -376,7 +383,8 @@ namespace StarterAssets
                 if (FootstepAudioClips.Length > 0)
                 {
                     var index = Random.Range(0, FootstepAudioClips.Length);
-                    AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(_controller.center), FootstepAudioVolume);
+                    //AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(_controller.center), FootstepAudioVolume);
+                    AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(_controller.Controller.center), FootstepAudioVolume);
                 }
             }
         }
@@ -385,7 +393,8 @@ namespace StarterAssets
         {
             if (animationEvent.animatorClipInfo.weight > 0.5f)
             {
-                AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
+                // AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
+                AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.Controller.center), FootstepAudioVolume);
             }
         }
     }

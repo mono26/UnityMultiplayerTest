@@ -1,13 +1,18 @@
+#if GAME_CLIENT
 using Fusion;
 using Fusion.Sockets;
 using SLGFramework;
+using StarterAssets;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 namespace MultiplayerTest
 {
+
     public class GameClient : Singleton<GameClient>, INetworkRunnerCallbacks
     {
         [SerializeField] 
@@ -18,6 +23,8 @@ namespace MultiplayerTest
         private GameApp appReference = null;
 
         private NetworkRunner networkRunner = null;
+
+        private NetworkInputData inputData = new NetworkInputData();
 
         private void Start()
         {
@@ -57,23 +64,21 @@ namespace MultiplayerTest
 
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
-            if (this.networkRunner == runner && this.networkRunner.IsServer) {
-                this.CreatePlayer(player);
-            }
+            Debug.Log("OnPlayerJoined");
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            // Find and remove the players avatar
-            if (spawnedCharacters.TryGetValue(player, out NetworkObject networkObject)) {
-                runner.Despawn(networkObject);
-                spawnedCharacters.Remove(player);
-            }
+            Debug.Log("OnPlayerLeft");
         }
 
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
+            if (this.networkRunner != runner) {
+                return;
+            }
 
+            input.Set(this.inputData);
         }
 
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
@@ -88,22 +93,22 @@ namespace MultiplayerTest
 
         public void OnConnectedToServer(NetworkRunner runner)
         {
-
+            Debug.Log("OnConnectedToServer");
         }
 
         public void OnDisconnectedFromServer(NetworkRunner runner)
         {
-
+            Debug.LogError("OnDisconnectedFromServer");
         }
 
         public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
         {
-
+            Debug.Log("OnConnectRequest");
         }
 
         public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
         {
-
+            Debug.LogError("OnConnectFailed");
         }
 
         public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
@@ -141,24 +146,10 @@ namespace MultiplayerTest
 
         }
 
-        private void CreatePlayer(PlayerRef player)
-        {
-            if (this.playerPrefab == null) {
-                Debug.Log("Need a player prefab for instantiation.");
-                return;
-            }
-
-            // Create a unique position for the player
-            Vector3 spawnPosition = new Vector3((player.RawEncoded % this.networkRunner.Config.Simulation.DefaultPlayers) * 3, 1, 0);
-            NetworkObject networkPlayerObject = this.networkRunner.Spawn(this.playerPrefab, spawnPosition, Quaternion.identity, player);
-            // Keep track of the player avatars so we can remove it when they disconnect
-            spawnedCharacters.Add(player, networkPlayerObject);
-        }
-
-        public void ConnectToRoom(GameMode mode)
+        public void ConnectToRoom()
         {
             this.networkRunner.StartGame(new StartGameArgs() {
-                GameMode = mode,
+                GameMode = GameMode.Client,
                 SessionName = "TestRoom",
                 Scene = SceneManager.GetActiveScene().buildIndex,
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
@@ -169,5 +160,39 @@ namespace MultiplayerTest
         {
             this.appReference = app;
         }
+
+        // TODO move this.
+#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
+        public void OnMove(InputValue value)
+        {
+            this.MoveInput(value.Get<Vector2>());
+        }
+
+        public void OnJump(InputValue value)
+        {
+            this.JumpInput(value.isPressed);
+        }
+
+        public void OnSprint(InputValue value)
+        {
+            this.SprintInput(value.isPressed);
+        }
+#endif
+
+        public void MoveInput(Vector2 newMoveDirection)
+        {
+            this.inputData.MoveDirection = newMoveDirection;
+        }
+
+        public void JumpInput(bool newJumpState)
+        {
+            this.inputData.Jump = newJumpState;
+        }
+
+        public void SprintInput(bool newSprintState)
+        {
+            this.inputData.Sprint = newSprintState;
+        }
     }
 }
+#endif

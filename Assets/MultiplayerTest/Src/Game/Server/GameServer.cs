@@ -197,14 +197,14 @@ namespace MultiplayerTest
                 SceneManager = this.networkRunner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
                 Scene = 2,
                 SessionProperties = this.serverConfig.SessionProperties,
-                Address = NetAddress.CreateFromIpPort("127.0.0.1", this.serverConfig.Port),
+                Address = NetAddress.LocalhostIPv4(this.serverConfig.Port),
                 CustomPublicAddress = externalAddr,
                 CustomLobbyName = this.serverConfig.Lobby,
                 CustomPhotonAppSettings = photonSettings,
             });
 
             if (result.Ok) {
-                Log.Debug($"Runner Start DONE");
+                Debug.Log($"Runner Start DONE");
 
                 this.isConnecting = false;
 
@@ -213,7 +213,7 @@ namespace MultiplayerTest
             }
             else {
                 // Quit the application if startup fails
-                Log.Debug($"Error while starting Server: {result.ShutdownReason}");
+                Debug.Log($"Error while starting Server: {result.ShutdownReason}");
 
                 // it can be used any error code that can be read by an external application
                 // using 0 means all went fine

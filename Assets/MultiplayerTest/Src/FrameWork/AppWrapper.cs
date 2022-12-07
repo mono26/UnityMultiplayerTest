@@ -1,4 +1,5 @@
 using SLGFramework;
+using UnityEngine.SceneManagement;
 
 namespace MultiplayerTest
 {
@@ -17,6 +18,9 @@ namespace MultiplayerTest
 
             this.appReference = new GameApp();
             this.appReference.Initialize();
+
+            // TODO use transition service.
+            SceneManager.LoadScene("LobbyScene");
         }
 
         protected override void OnBeginPlay()

@@ -26,11 +26,6 @@ namespace MultiplayerTest
         protected override void OnBeginPlay()
         {
             base.OnBeginPlay();
-
-            // TODO remove this.
-            // TODO create transition manager.
-            // SceneManager.LoadScene("LobbyScene");
-            // SceneManager.LoadScene("Playground");
         }
 
         public void LeaveRoom()

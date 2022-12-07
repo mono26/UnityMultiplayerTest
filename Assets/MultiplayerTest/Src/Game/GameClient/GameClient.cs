@@ -88,7 +88,10 @@ namespace MultiplayerTest
 
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
-
+            // Reload scene after shutdown
+            if (Application.isPlaying) {
+                SceneManager.LoadScene(1);
+            }
         }
 
         public void OnConnectedToServer(NetworkRunner runner)
@@ -99,6 +102,8 @@ namespace MultiplayerTest
         public void OnDisconnectedFromServer(NetworkRunner runner)
         {
             Debug.LogError("OnDisconnectedFromServer");
+
+            runner.Shutdown();
         }
 
         public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
@@ -109,6 +114,8 @@ namespace MultiplayerTest
         public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
         {
             Debug.LogError("OnConnectFailed");
+
+            runner.Shutdown();
         }
 
         public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
@@ -118,7 +125,7 @@ namespace MultiplayerTest
 
         public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
         {
-
+            Log.Debug($"Received: {sessionList.Count}");
         }
 
         public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
@@ -151,7 +158,9 @@ namespace MultiplayerTest
             this.networkRunner.StartGame(new StartGameArgs() {
                 GameMode = GameMode.Client,
                 SessionName = "localhost",
-                SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+                SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
+                Address = NetAddress.LocalhostIPv4(),
+                DisableClientSessionCreation = true,
             });
         }
 

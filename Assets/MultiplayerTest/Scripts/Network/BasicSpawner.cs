@@ -35,10 +35,12 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
             if (GUI.Button(new Rect(0, 0, 200, 40), "Host"))
             {
                 StartGame(GameMode.Host);
+                Debug.Log("Hosting a game...");
             }
             if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
             {
                 StartGame(GameMode.Client);
+                Debug.Log("Joining a game...");
             }
         }
     }
@@ -55,7 +57,12 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
-    public void OnInput(NetworkRunner runner, NetworkInput input) { }
+    public void OnInput(NetworkRunner runner, NetworkInput input)
+    {
+        var data = PlayerInputMaster.data;
+
+        input.Set(data);
+    }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
 

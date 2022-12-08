@@ -11,6 +11,8 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField]
     private NetworkPrefabRef _playerPrefab;
 
+    private PlayerInputMaster _inputMaster;
+
     private  NetworkRunner _runner;
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
@@ -62,6 +64,7 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
         var data = PlayerInputMaster.data;
 
         input.Set(data);
+
     }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }

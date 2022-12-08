@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
+    path: Assets/MultiplayerTest/Scenes/SampleFusion.unity
+    guid: 474f563070bcfb2439bc75e02f7ba6ae
+  - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
   - enabled: 1

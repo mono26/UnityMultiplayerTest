@@ -22,7 +22,7 @@ public class PlayerInputMaster : MonoBehaviour
         inputActions.Player.Move.performed += Move;
         inputActions.Player.Move.canceled += ctx =>
         {
-            data.direction = Vector3.zero;
+            //data.direction = Vector3.zero;
             //moveVectorInput = Vector3.zero;
         };
 
@@ -43,8 +43,8 @@ public class PlayerInputMaster : MonoBehaviour
 
     public void Move(InputAction.CallbackContext ctx)
     {
-        data.direction.x = ctx.ReadValue<Vector2>().x;
-        data.direction.z = ctx.ReadValue<Vector2>().y;
+        //data.direction.x = ctx.ReadValue<Vector2>().x;
+        //data.direction.z = ctx.ReadValue<Vector2>().y;
         /* moveVectorInput.x = ctx.ReadValue<Vector2>().x;
         moveVectorInput.z = ctx.ReadValue<Vector2>().y; */
     }

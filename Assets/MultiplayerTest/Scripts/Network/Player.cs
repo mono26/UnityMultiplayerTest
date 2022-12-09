@@ -25,7 +25,7 @@ public class Player : NetworkBehaviour
     {
         if (GetInput(out NetworkInputData data))
         {
-            data.direction.Normalize();
+            /* data.direction.Normalize();
 
             if (data.direction != Vector3.zero)
             {
@@ -37,7 +37,7 @@ public class Player : NetworkBehaviour
             moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             }
             else
-                moveDir = Vector3.zero;
+                moveDir = Vector3.zero; */
 
             _cc.Move(speed * moveDir * Runner.DeltaTime);
 

@@ -9,12 +9,12 @@ public class CharacterInputHandler : MonoBehaviour
     Vector2 viewInputVector = Vector2.zero;
     bool jumpRequest = false;
 
-    CharacterMovementHandler characterMovementHandler;
+    LocalCameraHandler localCameraHandler;
     StarterInputActions inputActions;
 
     void Awake()
     {
-        characterMovementHandler = GetComponent<CharacterMovementHandler>();
+        localCameraHandler = GetComponentInChildren<LocalCameraHandler>();
         inputActions = new StarterInputActions();
     }
 
@@ -27,18 +27,17 @@ public class CharacterInputHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Move Input
-        moveInputVector.x = Input.GetAxis("Horizontal");
-        moveInputVector.y = Input.GetAxis("Vertical");  
-
-        characterMovementHandler.SetViewInputVector(viewInputVector);
+        // Move Input  
+        moveInputVector = inputActions.Player.Move.ReadValue<Vector2>();
 
         // View Input
-        viewInputVector.x = Input.GetAxis("Mouse X");
-        viewInputVector.y = Input.GetAxis("Mouse Y") * -1;
+        viewInputVector = inputActions.Player.Look.ReadValue<Vector2>();
 
         // Jump Input
-        jumpRequest = Input.GetButtonDown("Jump");         
+        if (inputActions.Player.Jump.triggered)
+            jumpRequest = true;
+        
+        localCameraHandler.SetViewInputVector(viewInputVector);
     }
 
     public NetworkInputData GetNetworkInput()
@@ -46,10 +45,14 @@ public class CharacterInputHandler : MonoBehaviour
         NetworkInputData networkInputData = new NetworkInputData();
 
         networkInputData.movementInput = moveInputVector;
-        networkInputData.rotationInput = viewInputVector.x; // Just sending the x axis for now
-        
+        networkInputData.aimForwardVector = localCameraHandler.transform.forward; // Just sending the x axis for now
         networkInputData.jumpRequest = jumpRequest;
+
+        jumpRequest = false;
 
         return networkInputData;
     }
+
+    public void OnEnable() => inputActions.Enable();
+    public void OnDisable() => inputActions.Disable();
 }

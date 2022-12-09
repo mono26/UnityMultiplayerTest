@@ -5,10 +5,6 @@ using Fusion;
 
 public class CharacterMovementHandler : NetworkBehaviour
 {
-    Vector2 viewInput;
-
-    float cameraRotationX = 0f;
-
     NetworkCharacterControllerPrototypeCustom characterController;
     Camera localCamera;
     
@@ -23,22 +19,16 @@ public class CharacterMovementHandler : NetworkBehaviour
         
     }
 
-    void Update()
-    {
-        // This just reflects locally, it doesn't send anything to the server
-        // 
-        cameraRotationX += viewInput.y * Time.deltaTime * characterController.viewUpDownRotationSpeed;
-        cameraRotationX = Mathf.Clamp(cameraRotationX, -90f, 90f);
-
-        localCamera.transform.localRotation = Quaternion.Euler(cameraRotationX, 0f, 0f);
-    }
-
     public override void FixedUpdateNetwork()
     {
         if (GetInput(out NetworkInputData networkInputData))
         {
             //Rotate
-            characterController.Rotate(networkInputData.rotationInput);
+            transform.forward = Vector3.RotateTowards(transform.forward, networkInputData.aimForwardVector, Time.deltaTime * characterController.rotationSpeed, 0f);
+
+            Quaternion rotation = transform.rotation;
+            rotation.eulerAngles = new Vector3(0f, rotation.eulerAngles.y, rotation.eulerAngles.z);
+            transform.rotation = rotation;
 
             //Move
             Vector3 moveDirection = transform.forward * networkInputData.movementInput.y + transform.right * networkInputData.movementInput.x;
@@ -50,10 +40,5 @@ public class CharacterMovementHandler : NetworkBehaviour
             if (networkInputData.jumpRequest)
                 characterController.Jump();
         }
-    }
-
-    public void SetViewInputVector(Vector2 viewInputVector)
-    {
-        viewInput = viewInputVector;
     }
 }

@@ -6,17 +6,30 @@ using Fusion;
 public class CharacterMovementHandler : NetworkBehaviour
 {
     NetworkCharacterControllerPrototypeCustom characterController;
+    NetworkMecanimAnimator networkMecanimAnimator;
     Camera localCamera;
+
+    public float animationSpeed = 2f;
+    private int _animIDSpeed;
+    private int _animIDGrounded;
+    private int _animIDJump;
+    private int _animIDFreeFall;
+    private int _animIDMotionSpeed;
     
     void Awake()
     {
         characterController = GetComponent<NetworkCharacterControllerPrototypeCustom>();
+        networkMecanimAnimator = GetComponent<NetworkMecanimAnimator>();
         localCamera = GetComponentInChildren<Camera>();
     }
 
     void Start()
     {
-        
+        _animIDSpeed = Animator.StringToHash("Speed");
+        _animIDGrounded = Animator.StringToHash("Grounded");
+        _animIDJump = Animator.StringToHash("Jump");
+        _animIDFreeFall = Animator.StringToHash("FreeFall");
+        _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
     }
 
     public override void FixedUpdateNetwork()
@@ -35,10 +48,26 @@ public class CharacterMovementHandler : NetworkBehaviour
             moveDirection.Normalize();
 
             characterController.Move(moveDirection);
+            networkMecanimAnimator.Animator.SetFloat(_animIDSpeed, moveDirection.magnitude * animationSpeed);
+            networkMecanimAnimator.Animator.SetFloat(_animIDMotionSpeed, characterController.Velocity.magnitude);
 
             //Jump
             if (networkInputData.jumpRequest)
+            {
                 characterController.Jump();
+                networkMecanimAnimator.Animator.SetBool(_animIDJump, networkInputData.jumpRequest);
+            }
+
+            if (characterController.IsGrounded)
+            {
+                networkMecanimAnimator.Animator.SetBool(_animIDGrounded, true);
+                networkMecanimAnimator.Animator.SetBool(_animIDJump, false);
+            }
+            else
+            {
+                networkMecanimAnimator.Animator.SetBool(_animIDGrounded, false);
+                networkMecanimAnimator.Animator.SetBool(_animIDJump, true);
+            }
         }
     }
 }

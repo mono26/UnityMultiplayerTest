@@ -1,3 +1,8 @@
+#if UNITY_SERVER
+#define GAME_SERVER
+#undef GAME_CLIENT
+#endif
+
 #if GAME_SERVER
 using Fusion;
 using Fusion.Photon.Realtime;
@@ -190,6 +195,13 @@ namespace MultiplayerTest
 
             this.isConnecting = true;
 
+            NetAddress address;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            address = NetAddress.LocalhostIPv4();
+#elif UNITY_SERVER || GAME_SERVER
+            address = NetAddress.CreateFromIpPort(this.serverConfig.IP, this.serverConfig.Port); 
+#endif
+
             // Start Runner
             StartGameResult result = await this.networkRunner.StartGame(new StartGameArgs() {
                 SessionName = this.serverConfig.SessionName,
@@ -197,7 +209,7 @@ namespace MultiplayerTest
                 SceneManager = this.networkRunner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
                 Scene = 2,
                 SessionProperties = this.serverConfig.SessionProperties,
-                Address = NetAddress.LocalhostIPv4(this.serverConfig.Port),
+                Address = address,
                 CustomPublicAddress = externalAddr,
                 CustomLobbyName = this.serverConfig.Lobby,
                 CustomPhotonAppSettings = photonSettings,

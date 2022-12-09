@@ -11,6 +11,7 @@ namespace SLGFramework
         public string Region { get; private set; }
         public string Lobby { get; private set; }
         public ushort Port { get; private set; } = 6540;
+        public string IP { get; private set; }
         public ushort PublicPort { get; private set; }
         public string PublicIP { get; private set; }
         public Dictionary<string, SessionProperty> SessionProperties { get; private set; } = new Dictionary<string, SessionProperty>();

@@ -1,3 +1,8 @@
+#if UNITY_SERVER
+#define GAME_SERVER
+#undef GAME_CLIENT
+#endif
+
 #if GAME_CLIENT
 using Fusion;
 using Fusion.Sockets;
@@ -155,11 +160,18 @@ namespace MultiplayerTest
 
         public void ConnectToRoom()
         {
+            NetAddress address;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            address = NetAddress.LocalhostIPv4();
+#elif GAME_CLIENT
+            // address = NetAddress.CreateFromIpPort(this.serverConfig.IP, this.serverConfig.Port); 
+#endif
+
             this.networkRunner.StartGame(new StartGameArgs() {
                 GameMode = GameMode.Client,
                 SessionName = "localhost",
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
-                Address = NetAddress.LocalhostIPv4(),
+                Address = address,
                 DisableClientSessionCreation = true,
             });
         }

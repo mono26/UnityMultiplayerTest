@@ -162,7 +162,8 @@ namespace MultiplayerTest
         {
             NetAddress address;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            address = NetAddress.LocalhostIPv4();
+            // address = NetAddress.LocalhostIPv4();
+            address = NetAddress.CreateFromIpPort("35.198.23.94", 9000);
 #elif GAME_CLIENT
             // address = NetAddress.CreateFromIpPort(this.serverConfig.IP, this.serverConfig.Port); 
 #endif

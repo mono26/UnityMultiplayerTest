@@ -24,7 +24,7 @@ namespace MultiplayerTest
         private void OnButtonTriggered()
         {
 #if GAME_CLIENT
-            GameClient.Instance.ConnectToRoom();
+            GameClient.Instance.ConnectToServer();
 #endif
         }
     }

@@ -1,16 +1,19 @@
+#if UNITY_SERVER
+#define GAME_SERVER
+#undef GAME_CLIENT
+#endif
+
 using Fusion;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace SLGFramework
 {
     public class ServerConfig
     {
-        public string SessionName { get; private set; } = "localhost";
+        public string SessionName { get; private set; } = "multiplayer-test-dev";
         public string Region { get; private set; } = "sa";
         public string Lobby { get; private set; }
-        public ushort Port { get; private set; } = 6540;
+        public ushort Port { get; private set; } = 27015;
         public string IP { get; private set; } = "0.0.0.0";
         public ushort PublicPort { get; private set; }
         public string PublicIP { get; private set; }
@@ -22,6 +25,7 @@ namespace SLGFramework
         {
             ServerConfig config = new ServerConfig();
 
+#if GAME_SERVER
             // Session Name
             if (CommandLineUtils.TryGetArg(out string sessionName, "-session")) {
                 config.SessionName = sessionName;
@@ -67,6 +71,7 @@ namespace SLGFramework
 
                 config.SessionProperties.Add(key, value);
             }
+#endif
 
             return config;
         }

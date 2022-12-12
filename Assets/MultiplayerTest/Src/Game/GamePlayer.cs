@@ -17,12 +17,18 @@ namespace MultiplayerTest
 
         public override void FixedUpdateNetwork()
         {
-            if (GetInput(out NetworkInputData data)) {
+            if (!HasInputAuthority) {
+                return;
+            }
+
+            if (this.GetInput(out NetworkInputData data)) {
                 data.MoveDirection.Normalize();
 
-                this.input.MoveInput(data.MoveDirection);
-                this.input.JumpInput(data.Jump);
-                this.input.SprintInput(data.Sprint);
+                //this.input.MoveInput(data.MoveDirection);
+                //this.input.JumpInput(data.Jump);
+                //this.input.SprintInput(data.Sprint);
+
+                this.transform.position = this.transform.position + new Vector3(data.MoveDirection.x, 0, data.MoveDirection.y);
             }
         }
     }

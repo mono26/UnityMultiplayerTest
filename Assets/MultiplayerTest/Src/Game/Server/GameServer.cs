@@ -44,6 +44,8 @@ namespace MultiplayerTest
 
         protected override void OnInitialize()
         {
+            Log.Info("Initialize GameServer");
+
             base.OnInitialize();
 
             if (!this.TryGetComponent<NetworkRunner>(out this.networkRunner)) {
@@ -55,9 +57,11 @@ namespace MultiplayerTest
 
         protected override void OnBeginPlay()
         {
+            Log.Info("BeginPlay GameServer");
+
             base.OnBeginPlay();
 
-            // this.ConnectToNetwork();
+            this.ConnectToNetwork();
         }
 
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
@@ -66,7 +70,7 @@ namespace MultiplayerTest
                 return;
             }
 
-            Debug.Log("OnPlayerJoined");
+            Log.Info("OnPlayerJoined");
 
             this.CreatePlayer(player);
         }
@@ -101,7 +105,7 @@ namespace MultiplayerTest
 
         public void OnConnectedToServer(NetworkRunner runner)
         {
-            Debug.Log("OnConnectedToServer");
+            Log.Info("OnConnectedToServer");
         }
 
         public void OnDisconnectedFromServer(NetworkRunner runner)
@@ -111,12 +115,12 @@ namespace MultiplayerTest
 
         public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
         {
-            Debug.Log("OnConnectRequest");
+            Log.Info("OnConnectRequest");
         }
 
         public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
         {
-            Debug.LogError("OnConnectFailed");
+            Log.Error("OnConnectFailed");
         }
 
         public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
@@ -157,7 +161,7 @@ namespace MultiplayerTest
         private void CreatePlayer(PlayerRef player)
         {
             if (this.playerPrefab == null) {
-                Debug.Log("Need a player prefab for instantiation.");
+                Log.Info("Need a player prefab for instantiation.");
                 return;
             }
 
@@ -170,7 +174,7 @@ namespace MultiplayerTest
 
         public async void ConnectToNetwork()
         {
-            Debug.Log("Attempting to create server.");
+            Log.Info($"ConnectToNetwork");
 
             this.serverConfig = ServerConfig.Resolve();
 
@@ -199,8 +203,10 @@ namespace MultiplayerTest
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             address = NetAddress.LocalhostIPv4();
 #elif UNITY_SERVER || GAME_SERVER
-            address = NetAddress.CreateFromIpPort(this.serverConfig.IP, this.serverConfig.Port); 
+            address = NetAddress.Any(this.serverConfig.Port);
 #endif
+
+            Log.Info($"Attempting to create server at {address.ToString()}.");
 
             // Start Runner
             StartGameResult result = await this.networkRunner.StartGame(new StartGameArgs() {
@@ -216,7 +222,7 @@ namespace MultiplayerTest
             });
 
             if (result.Ok) {
-                Debug.Log($"Runner Start DONE");
+                Log.Info($"Server Start DONE");
 
                 this.isConnecting = false;
 
@@ -225,7 +231,7 @@ namespace MultiplayerTest
             }
             else {
                 // Quit the application if startup fails
-                Debug.Log($"Error while starting Server: {result.ShutdownReason}");
+                Log.Info($"Error while starting Server: {result.ShutdownReason}");
 
                 // it can be used any error code that can be read by an external application
                 // using 0 means all went fine

@@ -23,6 +23,8 @@ namespace MultiplayerTest
         [SerializeField] 
         private NetworkPrefabRef playerPrefab;
 
+        private bool isConnecting = false;
+
         private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
         private GameApp appReference = null;
@@ -30,6 +32,8 @@ namespace MultiplayerTest
         private NetworkRunner networkRunner = null;
 
         private NetworkInputData inputData = new NetworkInputData();
+
+        private ServerConfig serverConfig = null;
 
         private void Start()
         {
@@ -50,6 +54,8 @@ namespace MultiplayerTest
 
         protected override void OnInitialize()
         {
+            Log.Info("Initialize GameClient");
+
             base.OnInitialize();
 
             if (!this.TryGetComponent<NetworkRunner>(out this.networkRunner)) {
@@ -64,7 +70,7 @@ namespace MultiplayerTest
             base.OnBeginPlay();
 
             // Initialize the instance in charge of handling game logic.
-            GameRunner.Instance.Initialize();
+            // this.ConnectToServer();
         }
 
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
@@ -158,23 +164,39 @@ namespace MultiplayerTest
 
         }
 
-        public void ConnectToRoom()
+        public async void ConnectToServer()
         {
+            this.serverConfig = ServerConfig.Resolve();
+
             NetAddress address;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            // address = NetAddress.LocalhostIPv4();
-            address = NetAddress.CreateFromIpPort("35.198.23.94", 9000);
+            address = NetAddress.LocalhostIPv4();
 #elif GAME_CLIENT
-            // address = NetAddress.CreateFromIpPort(this.serverConfig.IP, this.serverConfig.Port); 
+            address = NetAddress.CreateFromIpPort(this.serverConfig.IP, this.serverConfig.Port);
 #endif
 
-            this.networkRunner.StartGame(new StartGameArgs() {
+            this.isConnecting = true;
+
+            StartGameResult result = await this.networkRunner.StartGame(new StartGameArgs() {
                 GameMode = GameMode.Client,
-                SessionName = "localhost",
+                SessionName = this.serverConfig.SessionName,
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
                 Address = address,
                 DisableClientSessionCreation = true,
             });
+
+            if (result.Ok) {
+                Log.Info($"Client Start DONE");
+
+                this.isConnecting = false;
+
+                // Initialize the instance in charge of handling game logic.
+                GameRunner.Instance.Initialize();
+            }
+            else {
+                // Quit the application if startup fails
+                Log.Info($"Error while starting Server: {result.ShutdownReason}");
+            }
         }
 
         public void SetAppReference(GameApp app)

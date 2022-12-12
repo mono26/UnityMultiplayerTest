@@ -5,7 +5,10 @@ using Fusion;
 
 public class CharacterMovementHandler : NetworkBehaviour
 {
+    bool isRespawnedRequested = false;
+
     NetworkCharacterControllerPrototypeCustom characterController;
+    HPHandler hpHandler;
     NetworkMecanimAnimator networkMecanimAnimator;
     Camera localCamera;
 
@@ -19,6 +22,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     void Awake()
     {
         characterController = GetComponent<NetworkCharacterControllerPrototypeCustom>();
+        hpHandler = GetComponent<HPHandler>();
         networkMecanimAnimator = GetComponent<NetworkMecanimAnimator>();
         localCamera = GetComponentInChildren<Camera>();
     }
@@ -34,6 +38,18 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
+        if (!Object.HasInputAuthority)
+        {
+            if (isRespawnedRequested)
+            {
+                Respawn();
+                return;
+            }
+
+            if (hpHandler.isDead)
+                return;
+        }
+
         if (GetInput(out NetworkInputData networkInputData))
         {
             //Rotate
@@ -69,5 +85,23 @@ public class CharacterMovementHandler : NetworkBehaviour
                 networkMecanimAnimator.Animator.SetBool(_animIDJump, true);
             }
         }
+    }
+
+    public void RequestSpawn()
+    {
+        isRespawnedRequested = true;
+    }
+
+    void Respawn()
+    {
+        characterController.TeleportToPosition(Utils.GetRandomSpawnPoint());
+
+        hpHandler.OnRespawned();
+        isRespawnedRequested = false;
+    }
+    
+    public void SetCharacterControllerEnabled(bool enabled)
+    {
+        characterController.Controller.enabled = enabled;
     }
 }

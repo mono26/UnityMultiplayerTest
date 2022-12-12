@@ -10,10 +10,10 @@ namespace SLGFramework
 {
     public class ServerConfig
     {
-        public string SessionName { get; private set; } = "multiplayer-test-dev";
+        public string SessionName { get; private set; } = "localhost";
         public string Region { get; private set; } = "sa";
         public string Lobby { get; private set; }
-        public ushort Port { get; private set; } = 27015;
+        public ushort Port { get; private set; } = 6540;
         public string IP { get; private set; } = "0.0.0.0";
         public ushort PublicPort { get; private set; }
         public string PublicIP { get; private set; }

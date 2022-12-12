@@ -57,6 +57,10 @@ namespace MultiplayerTest
 
         protected override void OnBeginPlay()
         {
+            if (this.isConnecting) {
+                return;
+            }
+
             Log.Info("BeginPlay GameServer");
 
             base.OnBeginPlay();
@@ -206,19 +210,20 @@ namespace MultiplayerTest
             address = NetAddress.Any(this.serverConfig.Port);
 #endif
 
-            Log.Info($"Attempting to create server at {address.ToString()}.");
+            Log.Info($"Attempting to create server at {address}.");
 
             // Start Runner
             StartGameResult result = await this.networkRunner.StartGame(new StartGameArgs() {
-                SessionName = this.serverConfig.SessionName,
+                // SessionName = "localhost",
                 GameMode = GameMode.Server,
                 SceneManager = this.networkRunner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
                 Scene = 2,
                 SessionProperties = this.serverConfig.SessionProperties,
                 Address = address,
-                CustomPublicAddress = externalAddr,
-                CustomLobbyName = this.serverConfig.Lobby,
-                CustomPhotonAppSettings = photonSettings,
+                // CustomPublicAddress = externalAddr,
+                // CustomLobbyName = this.serverConfig.Lobby,
+                // CustomPhotonAppSettings = photonSettings,
+                PlayerCount = 4
             });
 
             if (result.Ok) {

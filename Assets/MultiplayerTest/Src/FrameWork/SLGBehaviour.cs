@@ -4,21 +4,21 @@ namespace SLGFramework
 {
     public abstract class SLGBehaviour : MonoBehaviour
     {
-        private bool isInitialized = false;
-        private bool isPlaying = false;
+        protected bool IsInitialized { get; private set; } = false;
+        protected bool IsPlaying { get; private set; } = false;
 
         /// <summary>
         /// Should be called in the Awake(). Better used for catching references, and stuff needed before start playing.
         /// </summary>
         public void Initialize()
         {
-            if (this.isInitialized) {
+            if (this.IsInitialized) {
                 return;
             }
 
             this.OnInitialize();
 
-            this.isInitialized = true;
+            this.IsInitialized = true;
         }
 
         /// <summary>
@@ -26,13 +26,13 @@ namespace SLGFramework
         /// </summary>
         public void BeginPlay()
         {
-            if (this.isPlaying) {
+            if (this.IsPlaying) {
                 return;
             }
 
             this.OnBeginPlay();
 
-            this.isPlaying = true;
+            this.IsPlaying = true;
         }
 
         protected virtual void OnBeginPlay() { }

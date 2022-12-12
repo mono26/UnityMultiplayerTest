@@ -11,13 +11,13 @@ using StarterAssets;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Net;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 namespace MultiplayerTest
 {
-
     public class GameClient : Singleton<GameClient>, INetworkRunnerCallbacks
     {
         [SerializeField] 
@@ -168,6 +168,18 @@ namespace MultiplayerTest
         {
             this.serverConfig = ServerConfig.Resolve();
 
+            // Build Custom External Addr
+            NetAddress? externalAddr = null;
+
+            if (string.IsNullOrEmpty(this.serverConfig.PublicIP) == false && this.serverConfig.PublicPort > 0) {
+                if (IPAddress.TryParse(this.serverConfig.PublicIP, out var _)) {
+                    externalAddr = NetAddress.CreateFromIpPort(this.serverConfig.PublicIP, this.serverConfig.PublicPort);
+                }
+                else {
+                    Log.Warn("Unable to parse 'Custom Public IP'");
+                }
+            }
+
             NetAddress address;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             address = NetAddress.LocalhostIPv4();
@@ -177,11 +189,14 @@ namespace MultiplayerTest
 
             this.isConnecting = true;
 
+            Log.Info($"Attempting to join server at {address}.");
+
             StartGameResult result = await this.networkRunner.StartGame(new StartGameArgs() {
                 GameMode = GameMode.Client,
-                SessionName = this.serverConfig.SessionName,
+                // SessionName = "localhost",
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
                 Address = address,
+                // CustomPublicAddress = externalAddr,
                 DisableClientSessionCreation = true,
             });
 
@@ -195,7 +210,7 @@ namespace MultiplayerTest
             }
             else {
                 // Quit the application if startup fails
-                Log.Info($"Error while starting Server: {result.ShutdownReason}");
+                Log.Info($"Error while joining Server: {result.ShutdownReason}");
             }
         }
 
@@ -208,16 +223,22 @@ namespace MultiplayerTest
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
         public void OnMove(InputValue value)
         {
+            Log.Error("OnMove");
+
             this.MoveInput(value.Get<Vector2>());
         }
 
         public void OnJump(InputValue value)
         {
+            Log.Error("OnJump");
+
             this.JumpInput(value.isPressed);
         }
 
         public void OnSprint(InputValue value)
         {
+            Log.Error("OnSprint");
+
             this.SprintInput(value.isPressed);
         }
 #endif

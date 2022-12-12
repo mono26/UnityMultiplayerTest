@@ -13,6 +13,12 @@ namespace MultiplayerTest
 {
     public class GameApp : SLGScript
     {
+#if GAME_SERVER
+        private GameServer server = null;
+#elif GAME_CLIENT
+        private GameClient client = null;
+#endif
+
         private ServiceProvider serviceProvider = null;
 
         public string AppVersion { get; private set; } = "1";

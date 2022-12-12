@@ -7,7 +7,7 @@ namespace MultiplayerTest
     public class PlayerAnimationEventsHandler : SLGBehaviour
     {
         [SerializeField]
-        private ThirdPersonController characterController = null;
+        private GameCharacterController characterController = null;
 
         private void OnFootstep(AnimationEvent animationEvent)
         {

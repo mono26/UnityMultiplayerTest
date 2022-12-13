@@ -10,7 +10,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     NetworkCharacterControllerPrototypeCustom characterController;
     HPHandler hpHandler;
     NetworkMecanimAnimator networkMecanimAnimator;
-    Camera localCamera;
+    //Camera localCamera;
 
     public float animationSpeed = 2f;
     private int _animIDSpeed;
@@ -24,7 +24,7 @@ public class CharacterMovementHandler : NetworkBehaviour
         characterController = GetComponent<NetworkCharacterControllerPrototypeCustom>();
         hpHandler = GetComponent<HPHandler>();
         networkMecanimAnimator = GetComponent<NetworkMecanimAnimator>();
-        localCamera = GetComponentInChildren<Camera>();
+        //localCamera = GetComponentInChildren<Camera>();
     }
 
     void Start()

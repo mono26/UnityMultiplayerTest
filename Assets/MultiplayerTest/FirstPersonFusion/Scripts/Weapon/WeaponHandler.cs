@@ -16,10 +16,12 @@ public class WeaponHandler : NetworkBehaviour
     float lastTimeFired = 0f;
 
     HPHandler hpHandler;
+    NetworkPlayer networkPlayer;
 
     private void Awake()
     {
         hpHandler = GetComponent<HPHandler>();
+        networkPlayer = GetComponent<NetworkPlayer>();
     }
 
     public override void FixedUpdateNetwork()
@@ -52,7 +54,7 @@ public class WeaponHandler : NetworkBehaviour
         if (hitInfo.Hitbox != null)
         {
             if (Object.HasStateAuthority)
-                hitInfo.Hitbox.transform.root.GetComponent<HPHandler>().OnTakeDamage();
+                hitInfo.Hitbox.transform.root.GetComponent<HPHandler>().OnTakeDamage(networkPlayer.nickName.Value);
 
             isHitOtherPlayer = true;
         }

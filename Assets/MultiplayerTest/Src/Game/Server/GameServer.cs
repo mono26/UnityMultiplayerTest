@@ -3,7 +3,6 @@
 #undef GAME_CLIENT
 #endif
 
-#if GAME_SERVER
 using Fusion;
 using Fusion.Photon.Realtime;
 using Fusion.Sockets;
@@ -220,7 +219,7 @@ namespace MultiplayerTest
                 Scene = 2,
                 SessionProperties = this.serverConfig.SessionProperties,
                 Address = address,
-                // CustomPublicAddress = externalAddr,
+                CustomPublicAddress = externalAddr,
                 // CustomLobbyName = this.serverConfig.Lobby,
                 // CustomPhotonAppSettings = photonSettings,
                 PlayerCount = 4
@@ -250,4 +249,3 @@ namespace MultiplayerTest
         }
     }
 }
-#endif

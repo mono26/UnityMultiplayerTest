@@ -1,3 +1,4 @@
+using Fusion;
 using UnityEngine;
 
 namespace MultiplayerTest
@@ -13,14 +14,11 @@ namespace MultiplayerTest
 
         public override void FixedUpdateNetwork()
         {
-            if (!HasInputAuthority) {
-                return;
-            }
-
             if (this.GetInput(out NetworkInputData data)) {
                 data.MoveDirection.Normalize();
 
                 this.input.MoveInput(data.MoveDirection);
+                this.input.LookInput(data.LookInput);
                 this.input.JumpInput(data.Jump);
                 this.input.SprintInput(data.Sprint);
             }

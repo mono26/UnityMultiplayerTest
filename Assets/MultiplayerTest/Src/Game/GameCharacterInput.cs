@@ -24,6 +24,10 @@ namespace MultiplayerTest
 
         public void LookInput(Vector2 newLookDirection)
         {
+            if (!this.cursorInputForLook) {
+                return;
+            }
+
             this.look = newLookDirection;
         }
 
@@ -39,7 +43,7 @@ namespace MultiplayerTest
 
         private void OnApplicationFocus(bool hasFocus)
         {
-            SetCursorState(cursorLocked);
+            this.SetCursorState(this.cursorLocked);
         }
 
         private void SetCursorState(bool newState)

@@ -3,14 +3,11 @@
 #undef GAME_CLIENT
 #endif
 
-#if GAME_CLIENT
 using Fusion;
 using Fusion.Sockets;
 using SLGFramework;
-using StarterAssets;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Net;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -76,11 +73,26 @@ namespace MultiplayerTest
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
             Debug.Log("OnPlayerJoined");
+            if (this.networkRunner != runner) {
+                return;
+            }
+
+            if(this.networkRunner.TryGetPlayerObject(player, out NetworkObject playerObject)) {
+                this.spawnedCharacters.Add(player, playerObject);
+            }
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
             Debug.Log("OnPlayerLeft");
+
+            if (this.networkRunner != runner) {
+                return;
+            }
+
+            if (this.spawnedCharacters.ContainsKey(player)) {
+                this.spawnedCharacters.Remove(player);
+            }
         }
 
         public void OnInput(NetworkRunner runner, NetworkInput input)
@@ -183,6 +195,7 @@ namespace MultiplayerTest
             NetAddress address;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             address = NetAddress.LocalhostIPv4();
+            //address = NetAddress.CreateFromIpPort(this.serverConfig.IP, this.serverConfig.Port);
 #elif GAME_CLIENT
             address = NetAddress.CreateFromIpPort(this.serverConfig.IP, this.serverConfig.Port);
 #endif
@@ -196,7 +209,7 @@ namespace MultiplayerTest
                 // SessionName = "localhost",
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
                 Address = address,
-                // CustomPublicAddress = externalAddr,
+                CustomPublicAddress = externalAddr,
                 DisableClientSessionCreation = true,
             });
 
@@ -223,22 +236,29 @@ namespace MultiplayerTest
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
         public void OnMove(InputValue value)
         {
-            Log.Error("OnMove");
+            Vector2 inputValue = value.Get<Vector2>();
+            if (inputValue != Vector2.zero) {    
+                float targetRotation = Mathf.Atan2(inputValue.x, inputValue.y) * Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y;
+                Vector3 inputRotated = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
+                this.MoveInput(new Vector2(inputRotated.x, inputRotated.z));
+            }
+            else {
+                this.MoveInput(inputValue);
+            }
+        }
 
-            this.MoveInput(value.Get<Vector2>());
+        public void OnLook(InputValue value)
+        {
+            LookInput(value.Get<Vector2>());
         }
 
         public void OnJump(InputValue value)
         {
-            Log.Error("OnJump");
-
             this.JumpInput(value.isPressed);
         }
 
         public void OnSprint(InputValue value)
         {
-            Log.Error("OnSprint");
-
             this.SprintInput(value.isPressed);
         }
 #endif
@@ -246,6 +266,11 @@ namespace MultiplayerTest
         public void MoveInput(Vector2 newMoveDirection)
         {
             this.inputData.MoveDirection = newMoveDirection;
+        }
+
+        public void LookInput(Vector2 newLookDirection)
+        {
+            this.inputData.LookInput = newLookDirection;
         }
 
         public void JumpInput(bool newJumpState)
@@ -259,4 +284,3 @@ namespace MultiplayerTest
         }
     }
 }
-#endif

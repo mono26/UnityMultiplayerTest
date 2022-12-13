@@ -12,12 +12,11 @@ namespace MultiplayerTest
     [RequireComponent(typeof(CharacterController))]
     public class GameCharacterController : SLGBehaviour
     {
-#if GAME_SERVER
         [Header("Player")]
-        [Tooltip("Move speed of the character in m/s")]
+        [Tooltip("Move this.speed of the character in m/s")]
         public float MoveSpeed = 2.0f;
 
-        [Tooltip("Sprint speed of the character in m/s")]
+        [Tooltip("Sprint this.speed of the character in m/s")]
         public float SprintSpeed = 5.335f;
 
         [Tooltip("How fast the character turns to face movement direction")]
@@ -75,11 +74,11 @@ namespace MultiplayerTest
         public bool LockCameraPosition = false;
 
         // cinemachine
-        private float _cinemachineTargetYaw;
-        private float _cinemachineTargetPitch;
+        private float cinemachineTargetYaw = 0.0f;
+        private float cinemachineTargetPitch = 0.0f;
 
         // player
-        private float _speed;
+        private float speed = 0.0f;
         private float _animationBlend;
         private float _targetRotation = 0.0f;
         private float _rotationVelocity;
@@ -99,13 +98,13 @@ namespace MultiplayerTest
 
         private Animator animatorRef = null;
 
-        private NetworkCharacterControllerPrototype characterController = null;
+        private NetworkCharacterControllerImplementation characterController = null;
 
         private GameCharacterInput input = null;
 
         private const float _threshold = 0.01f;
 
-        private bool _hasAnimator;
+        private bool hasAnimator = false;
 
         private bool IsCurrentDeviceMouse
         {
@@ -130,7 +129,7 @@ namespace MultiplayerTest
                 return;
             }
 
-            _hasAnimator = TryGetComponent(out this.animatorRef) || this.transform.GetChild(0).TryGetComponent(out this.animatorRef);
+            this.hasAnimator = TryGetComponent(out this.animatorRef) || this.transform.GetChild(0).TryGetComponent(out this.animatorRef);
         }
 
         private void FixedUpdate()
@@ -157,7 +156,7 @@ namespace MultiplayerTest
         {
             base.OnInitialize();
 
-            this.characterController = this.GetComponent<NetworkCharacterControllerPrototype>();
+            this.characterController = this.GetComponent<NetworkCharacterControllerImplementation>();
 
             this.input = this.GetComponent<GameCharacterInput>();
         }
@@ -166,9 +165,9 @@ namespace MultiplayerTest
         {
             base.OnBeginPlay();
 
-            _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
+            this.cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
-            _hasAnimator = this.TryGetComponent(out this.animatorRef) || this.transform.GetChild(0).TryGetComponent(out this.animatorRef);
+            this.hasAnimator = this.TryGetComponent(out this.animatorRef) || this.transform.GetChild(0).TryGetComponent(out this.animatorRef);
 
             AssignAnimationIDs();
 
@@ -195,7 +194,7 @@ namespace MultiplayerTest
                 QueryTriggerInteraction.Ignore);
 
             // update animator if using character
-            if (_hasAnimator) {
+            if (this.hasAnimator) {
                 this.animatorRef.SetBool(_animIDGrounded, Grounded);
             }
         }
@@ -207,28 +206,28 @@ namespace MultiplayerTest
                 //Don't multiply mouse this.input by Time.fixedDeltaTime;
                 float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
 
-                _cinemachineTargetYaw += this.input.look.x * deltaTimeMultiplier;
-                _cinemachineTargetPitch += this.input.look.y * deltaTimeMultiplier;
+                this.cinemachineTargetYaw += this.input.look.x * deltaTimeMultiplier;
+                this.cinemachineTargetPitch += this.input.look.y * deltaTimeMultiplier;
             }
 
             // clamp our rotations so our values are limited 360 degrees
-            _cinemachineTargetYaw = ClampAngle(_cinemachineTargetYaw, float.MinValue, float.MaxValue);
-            _cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
+            this.cinemachineTargetYaw = ClampAngle(this.cinemachineTargetYaw, float.MinValue, float.MaxValue);
+            this.cinemachineTargetPitch = ClampAngle(this.cinemachineTargetPitch, BottomClamp, TopClamp);
 
             // Cinemachine will follow this target
-            CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride,
-                _cinemachineTargetYaw, 0.0f);
+            CinemachineCameraTarget.transform.rotation = Quaternion.Euler(this.cinemachineTargetPitch + CameraAngleOverride,
+                this.cinemachineTargetYaw, 0.0f);
         }
 
         private void Move()
         {
-            // set target speed based on move speed, sprint speed and if sprint is pressed
+            // set target this.speed based on move this.speed, sprint this.speed and if sprint is pressed
             float targetSpeed = this.input.sprint ? SprintSpeed : MoveSpeed;
 
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
             // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-            // if there is no this.input, set the target speed to 0
+            // if there is no this.input, set the target this.speed to 0
             if (this.input.move == Vector2.zero) {
                 targetSpeed = 0.0f;
             }
@@ -240,19 +239,19 @@ namespace MultiplayerTest
             float speedOffset = 0.1f;
             float inputMagnitude = this.input.analogMovement ? this.input.move.magnitude : 1f;
 
-            // accelerate or decelerate to target speed
+            // accelerate or decelerate to target this.speed
             if (currentHorizontalSpeed < targetSpeed - speedOffset ||
                 currentHorizontalSpeed > targetSpeed + speedOffset) {
-                // creates curved result rather than a linear one giving a more organic speed change
-                // note T in Lerp is clamped, so we don't need to clamp our speed
-                _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
+                // creates curved result rather than a linear one giving a more organic this.speed change
+                // note T in Lerp is clamped, so we don't need to clamp our this.speed
+                this.speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
                     Time.fixedDeltaTime * SpeedChangeRate);
 
-                // round speed to 3 decimal places
-                _speed = Mathf.Round(_speed * 1000f) / 1000f;
+                // round this.speed to 3 decimal places
+                this.speed = Mathf.Round(this.speed * 1000f) / 1000f;
             }
             else {
-                _speed = targetSpeed;
+                this.speed = targetSpeed;
             }
 
             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.fixedDeltaTime * SpeedChangeRate);
@@ -264,24 +263,25 @@ namespace MultiplayerTest
             // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is a move this.input rotate player when the player is moving
             if (this.input.move != Vector2.zero) {
-                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg/* + _mainCamera.transform.eulerAngles.y*/;
+                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg;
                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, RotationSmoothTime);
 
+#if GAME_SERVER
                 // rotate to face this.input direction relative to camera position
                 transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+#endif
             }
 
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
-
             // move the player
-            Vector3 movementVector = targetDirection.normalized * (_speed * Time.fixedDeltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.fixedDeltaTime;
+            Vector3 movementVector = targetDirection.normalized * (this.speed * Time.fixedDeltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.fixedDeltaTime;
 
-            Log.Info($"movement vector {movementVector}");
-
+#if GAME_SERVER
             this.characterController.Move(movementVector);
+#endif
 
             // update animator if using character
-            if (_hasAnimator) {
+            if (this.hasAnimator) {
                 this.animatorRef.SetFloat(_animIDSpeed, _animationBlend);
                 this.animatorRef.SetFloat(_animIDMotionSpeed, inputMagnitude);
             }
@@ -294,7 +294,7 @@ namespace MultiplayerTest
                 _fallTimeoutDelta = FallTimeout;
 
                 // update animator if using character
-                if (_hasAnimator) {
+                if (this.hasAnimator) {
                     this.animatorRef.SetBool(_animIDJump, false);
                     this.animatorRef.SetBool(_animIDFreeFall, false);
                 }
@@ -310,7 +310,7 @@ namespace MultiplayerTest
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 
                     // update animator if using character
-                    if (_hasAnimator) {
+                    if (this.hasAnimator) {
                         this.animatorRef.SetBool(_animIDJump, true);
                     }
                 }
@@ -330,16 +330,16 @@ namespace MultiplayerTest
                 }
                 else {
                     // update animator if using character
-                    if (_hasAnimator) {
+                    if (this.hasAnimator) {
                         this.animatorRef.SetBool(_animIDFreeFall, true);
                     }
                 }
 
                 // if we are not grounded, do not jump
-                this.input.jump = false;
+                this.input.JumpInput(false);
             }
 
-            // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
+            // apply gravity over time if under terminal (multiply by delta time twice to linearly this.speed up over time)
             if (_verticalVelocity < _terminalVelocity) {
                 _verticalVelocity += Gravity * Time.fixedDeltaTime;
             }
@@ -357,33 +357,36 @@ namespace MultiplayerTest
             Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
             Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
 
-            if (Grounded) Gizmos.color = transparentGreen;
-            else Gizmos.color = transparentRed;
+            if (Grounded) {
+                Gizmos.color = transparentGreen;
+            }
+            else {
+                Gizmos.color = transparentRed;
+            }
 
             // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
-            Gizmos.DrawSphere(
-                new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z),
-                GroundedRadius);
+            Gizmos.DrawSphere( new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
         }
 
         public void OnFootstep(AnimationEvent animationEvent)
         {
+#if GAME_CLIENT
             if (animationEvent.animatorClipInfo.weight > 0.5f) {
                 if (FootstepAudioClips.Length > 0) {
                     var index = Random.Range(0, FootstepAudioClips.Length);
-                    //AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(_controller.center), FootstepAudioVolume);
                     AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(this.characterController.Controller.center), FootstepAudioVolume);
                 }
             }
+#endif
         }
 
         public void OnLand(AnimationEvent animationEvent)
         {
+#if GAME_CLIENT
             if (animationEvent.animatorClipInfo.weight > 0.5f) {
-                // AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
                 AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(this.characterController.Controller.center), FootstepAudioVolume);
             }
-        }
 #endif
+        }
     }
 }

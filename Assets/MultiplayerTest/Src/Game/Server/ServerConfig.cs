@@ -13,10 +13,10 @@ namespace SLGFramework
         public string SessionName { get; private set; } = "localhost";
         public string Region { get; private set; } = "sa";
         public string Lobby { get; private set; }
-        public ushort Port { get; private set; } = 6540;
+        public ushort Port { get; private set; } = 27015;
         public string IP { get; private set; } = "0.0.0.0";
-        public ushort PublicPort { get; private set; }
-        public string PublicIP { get; private set; }
+        public ushort PublicPort { get; private set; } = 9000;
+        public string PublicIP { get; private set; } = "35.198.23.94";
         public Dictionary<string, SessionProperty> SessionProperties { get; private set; } = new Dictionary<string, SessionProperty>();
 
         private ServerConfig() { }

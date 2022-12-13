@@ -3,8 +3,7 @@
 #undef GAME_CLIENT
 #endif
 
-using System.Collections;
-using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
 
 namespace MultiplayerTest
@@ -27,11 +26,11 @@ namespace MultiplayerTest
             var previousPos = transform.position;
             var moveVelocity = Velocity;
 
-            direction = direction.normalized;
+            // direction = direction.normalized;
 
-            if (IsGrounded && moveVelocity.y < 0) {
-                moveVelocity.y = 0f;
-            }
+            //if (IsGrounded && moveVelocity.y < 0) {
+            //    moveVelocity.y = 0f;
+            //}
 
             // moveVelocity.y += gravity * Runner.DeltaTime;
 
@@ -43,14 +42,14 @@ namespace MultiplayerTest
                 horizontalVel = Vector3.Lerp(horizontalVel, default, braking * deltaTime);
             }
             else {
-                horizontalVel = Vector3.ClampMagnitude(horizontalVel + direction * acceleration * deltaTime, maxSpeed);
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Runner.DeltaTime);
+                horizontalVel = Vector3.ClampMagnitude(horizontalVel + direction /** acceleration*/ * deltaTime, maxSpeed);
+                //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Runner.DeltaTime);
             }
 
             moveVelocity.x = horizontalVel.x;
             moveVelocity.z = horizontalVel.z;
 
-            Controller.Move(moveVelocity * deltaTime);
+            Controller.Move(direction/** deltaTime*/);
 
             Velocity = (transform.position - previousPos) * Runner.Simulation.Config.TickRate;
             IsGrounded = this.characterController.Grounded;

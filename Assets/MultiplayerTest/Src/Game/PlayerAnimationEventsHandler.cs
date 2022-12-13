@@ -11,7 +11,6 @@ namespace MultiplayerTest
 {
     public class PlayerAnimationEventsHandler : SLGBehaviour
     {
-#if GAME_SERVER
         [SerializeField]
         private GameCharacterController characterController = null;
 
@@ -24,6 +23,5 @@ namespace MultiplayerTest
         {
             this.characterController?.OnLand(animationEvent);
         }
-#endif
     }
 }

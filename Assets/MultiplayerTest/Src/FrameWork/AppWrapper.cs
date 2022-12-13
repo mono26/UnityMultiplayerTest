@@ -1,11 +1,13 @@
 using SLGFramework;
-using UnityEngine.SceneManagement;
+using UnityEngine;
 
 namespace MultiplayerTest
 {
     public class AppWrapper : Singleton<AppWrapper>
     {
-        private GameApp appReference;
+        private PFBFactory<GameApp> gameAppFactory = null;
+
+        public GameApp AppReference { get; private set; } = null;
 
         private void Start()
         {
@@ -16,18 +18,14 @@ namespace MultiplayerTest
         {
             base.OnInitialize();
 
-            this.appReference = new GameApp();
-            this.appReference.Initialize();
-
-            // TODO use transition service.
-            SceneManager.LoadScene("LobbyScene");
+            this.gameAppFactory = new PFBFactory<GameApp>();
         }
 
         protected override void OnBeginPlay()
         {
             base.OnBeginPlay();
 
-            this.appReference.StartApp();
+            this.AppReference = this.gameAppFactory.CreateInstance(null, Vector3.zero, Quaternion.identity);
         }
     }
 }

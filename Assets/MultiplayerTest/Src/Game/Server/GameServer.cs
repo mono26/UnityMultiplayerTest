@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace MultiplayerTest
 {
-    public class GameServer : Singleton<GameServer>, INetworkRunnerCallbacks
+    public class GameServer : SLGBehaviour, INetworkRunnerCallbacks
     {
         [SerializeField]
         private NetworkPrefabRef playerPrefab;
@@ -28,6 +28,11 @@ namespace MultiplayerTest
         private GameApp appReference = null;
 
         private ServerConfig serverConfig = null;
+
+        private void Awake()
+        {
+            this.Initialize();
+        }
 
         private void Start()
         {

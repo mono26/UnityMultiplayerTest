@@ -23,8 +23,9 @@ namespace MultiplayerTest
 
         private void OnButtonTriggered()
         {
+            // TODO use event.
 #if GAME_CLIENT
-            GameClient.Instance.ConnectToServer();
+            AppWrapper.Instance.AppReference.GameClient.ConnectToServer();
 #endif
         }
     }

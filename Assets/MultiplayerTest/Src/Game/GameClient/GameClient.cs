@@ -15,7 +15,7 @@ using UnityEngine.SceneManagement;
 
 namespace MultiplayerTest
 {
-    public class GameClient : Singleton<GameClient>, INetworkRunnerCallbacks
+    public class GameClient : SLGBehaviour, INetworkRunnerCallbacks
     {
         [SerializeField] 
         private NetworkPrefabRef playerPrefab;
@@ -31,6 +31,11 @@ namespace MultiplayerTest
         private NetworkInputData inputData = new NetworkInputData();
 
         private ServerConfig serverConfig = null;
+
+        private void Awake()
+        {
+            this.Initialize();
+        }
 
         private void Start()
         {

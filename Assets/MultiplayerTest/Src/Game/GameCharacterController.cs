@@ -1,3 +1,9 @@
+#if UNITY_SERVER
+#define GAME_SERVER
+#undef GAME_CLIENT
+#endif
+
+using Fusion;
 using SLGFramework;
 using UnityEngine;
 
@@ -6,6 +12,7 @@ namespace MultiplayerTest
     [RequireComponent(typeof(CharacterController))]
     public class GameCharacterController : SLGBehaviour
     {
+#if GAME_SERVER
         [Header("Player")]
         [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 2.0f;
@@ -95,7 +102,6 @@ namespace MultiplayerTest
         private NetworkCharacterControllerPrototype characterController = null;
 
         private GameCharacterInput input = null;
-        private GameObject _mainCamera;
 
         private const float _threshold = 0.01f;
 
@@ -104,11 +110,7 @@ namespace MultiplayerTest
         private bool IsCurrentDeviceMouse
         {
             get {
-#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
-                return /*_playerInput.currentControlScheme == "KeyboardMouse"*/true;
-#else
-				return false;
-#endif
+				return true;
             }
         }
 
@@ -148,17 +150,16 @@ namespace MultiplayerTest
                 return;
             }
 
-            this.ThirdPersonCameraRotation();
+            this.RotateCameraRoot();
         }
 
         protected override void OnInitialize()
         {
             base.OnInitialize();
 
-            // get a reference to our main camera
-            if (_mainCamera == null) {
-                _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-            }
+            this.characterController = this.GetComponent<NetworkCharacterControllerPrototype>();
+
+            this.input = this.GetComponent<GameCharacterInput>();
         }
 
         protected override void OnBeginPlay()
@@ -168,10 +169,6 @@ namespace MultiplayerTest
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
             _hasAnimator = this.TryGetComponent(out this.animatorRef) || this.transform.GetChild(0).TryGetComponent(out this.animatorRef);
-
-            this.characterController = this.GetComponent<NetworkCharacterControllerPrototype>();
-
-            this.input = this.GetComponent<GameCharacterInput>();
 
             AssignAnimationIDs();
 
@@ -203,7 +200,7 @@ namespace MultiplayerTest
             }
         }
 
-        private void ThirdPersonCameraRotation()
+        private void RotateCameraRoot()
         {
             // if there is an this.input and camera position is not fixed
             if (this.input.look.sqrMagnitude >= _threshold && !LockCameraPosition) {
@@ -232,7 +229,9 @@ namespace MultiplayerTest
 
             // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is no this.input, set the target speed to 0
-            if (this.input.move == Vector2.zero) targetSpeed = 0.0f;
+            if (this.input.move == Vector2.zero) {
+                targetSpeed = 0.0f;
+            }
 
             // a reference to the players current horizontal velocity
             // float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
@@ -264,22 +263,22 @@ namespace MultiplayerTest
 
             // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is a move this.input rotate player when the player is moving
-            //if (this.input.move != Vector2.zero) {
-            //    _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-            //                      _mainCamera.transform.eulerAngles.y;
-            //    float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
-            //        RotationSmoothTime);
+            if (this.input.move != Vector2.zero) {
+                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg/* + _mainCamera.transform.eulerAngles.y*/;
+                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, RotationSmoothTime);
 
-            //    // rotate to face this.input direction relative to camera position
-            //    transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
-            //}
-
+                // rotate to face this.input direction relative to camera position
+                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+            }
 
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
             // move the player
-            this.characterController.Move(targetDirection.normalized * (_speed * Time.fixedDeltaTime) +
-                             new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.fixedDeltaTime);
+            Vector3 movementVector = targetDirection.normalized * (_speed * Time.fixedDeltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.fixedDeltaTime;
+
+            Log.Info($"movement vector {movementVector}");
+
+            this.characterController.Move(movementVector);
 
             // update animator if using character
             if (_hasAnimator) {
@@ -385,5 +384,6 @@ namespace MultiplayerTest
                 AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(this.characterController.Controller.center), FootstepAudioVolume);
             }
         }
+#endif
     }
 }

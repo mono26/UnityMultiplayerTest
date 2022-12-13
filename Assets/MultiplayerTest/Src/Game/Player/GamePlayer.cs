@@ -23,8 +23,6 @@ namespace MultiplayerTest
                 this.input.MoveInput(data.MoveDirection);
                 this.input.JumpInput(data.Jump);
                 this.input.SprintInput(data.Sprint);
-
-                // this.transform.position = this.transform.position + new Vector3(data.MoveDirection.x, 0, data.MoveDirection.y);
             }
         }
 

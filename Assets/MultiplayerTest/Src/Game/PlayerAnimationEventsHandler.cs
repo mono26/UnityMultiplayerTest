@@ -1,3 +1,8 @@
+#if UNITY_SERVER
+#define GAME_SERVER
+#undef GAME_CLIENT
+#endif
+
 using SLGFramework;
 using StarterAssets;
 using UnityEngine;
@@ -6,6 +11,7 @@ namespace MultiplayerTest
 {
     public class PlayerAnimationEventsHandler : SLGBehaviour
     {
+#if GAME_SERVER
         [SerializeField]
         private GameCharacterController characterController = null;
 
@@ -18,5 +24,6 @@ namespace MultiplayerTest
         {
             this.characterController?.OnLand(animationEvent);
         }
+#endif
     }
 }

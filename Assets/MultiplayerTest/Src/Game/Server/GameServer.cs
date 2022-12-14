@@ -223,13 +223,13 @@ namespace MultiplayerTest
 
             // Start Runner
             StartGameResult result = await this.networkRunner.StartGame(new StartGameArgs() {
-                // SessionName = "localhost",
+                SessionName = this.serverConfig.SessionName,
                 GameMode = GameMode.Server,
                 SceneManager = this.networkRunner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
                 Scene = 2,
                 SessionProperties = this.serverConfig.SessionProperties,
                 Address = address,
-                CustomPublicAddress = externalAddr,
+                // CustomPublicAddress = externalAddr,
                 // CustomLobbyName = this.serverConfig.Lobby,
                 CustomPhotonAppSettings = photonSettings
             });

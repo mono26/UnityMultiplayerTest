@@ -1,5 +1,5 @@
-using Fusion;
-using UnityEngine;
+using SLGFramework;
+using UnityEngine.InputSystem;
 
 namespace MultiplayerTest
 {
@@ -18,7 +18,7 @@ namespace MultiplayerTest
                 data.MoveDirection.Normalize();
 
                 this.input.MoveInput(data.MoveDirection);
-                this.input.LookInput(data.LookInput);
+                this.input.LookInput(data.LookDirection);
                 this.input.JumpInput(data.Jump);
                 this.input.SprintInput(data.Sprint);
             }
@@ -33,6 +33,9 @@ namespace MultiplayerTest
             }
 
             this.gameObject.AddComponent<LocalPlayerCamera>();
+            this.gameObject.AddComponent<LocalPlayerInputHandler>();
+
+            AppWrapper.Instance.AppReference.ServiceProvider.GetService<IEventManager>().Trigger(new GamePlayerSpawnedEvent(this));
         }
 
         protected override void OnInitialize()

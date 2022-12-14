@@ -12,7 +12,7 @@ namespace MultiplayerTest
 {
     public class GameApp : SLGBehaviour
     {
-        private ServiceProvider serviceProvider = null;
+        public string AppVersion { get; private set; } = "1";
 
 #if GAME_SERVER
         private PFBFactory<GameServer> gameServerFactory = null;
@@ -22,7 +22,7 @@ namespace MultiplayerTest
         public GameClient GameClient { get; private set; } = null;
 #endif
 
-        public string AppVersion { get; private set; } = "1";
+        public ServiceProvider ServiceProvider { get; private set; } = null;
 
         private void Awake()
         {
@@ -40,9 +40,9 @@ namespace MultiplayerTest
 
             this.AppVersion = "1";
 
-            this.serviceProvider = new ServiceProvider();
+            this.ServiceProvider = new ServiceProvider();
 
-            this.serviceProvider.InitService<IEventManager>();
+            this.ServiceProvider.InitService<IEventManager>();
 
 #if GAME_SERVER
             // Limit frame rate in server.

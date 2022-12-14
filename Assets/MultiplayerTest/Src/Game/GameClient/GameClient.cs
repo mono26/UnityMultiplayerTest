@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 namespace MultiplayerTest
@@ -29,8 +28,6 @@ namespace MultiplayerTest
 
         private NetworkRunner networkRunner = null;
 
-        private NetworkInputData inputData = new NetworkInputData();
-
         private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
         private void Awake()
@@ -41,6 +38,15 @@ namespace MultiplayerTest
         private void Start()
         {
             this.BeginPlay();   
+        }
+
+        private void OnDestroy()
+        {
+            if (!AppWrapper.HasInstance()) {
+                return;
+            }
+
+            AppWrapper.Instance.AppReference.ServiceProvider.GetService<IEventManager>().RemoveListener<GamePlayerSpawnedEvent>(this.OnGamePlayerSpawned);
         }
 
 #if UNITY_EDITOR
@@ -68,6 +74,8 @@ namespace MultiplayerTest
             this.networkRunner.AddCallbacks(this);
 
             this.gameRunnerFactory = new PFBFactory<GameRunner>();
+
+            AppWrapper.Instance.AppReference.ServiceProvider.GetService<IEventManager>().AddListener<GamePlayerSpawnedEvent>(this.OnGamePlayerSpawned);
         }
 
         protected override void OnBeginPlay()
@@ -81,13 +89,17 @@ namespace MultiplayerTest
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
             Debug.Log("OnPlayerJoined");
+
             if (this.networkRunner != runner) {
                 return;
             }
 
-            if(this.networkRunner.TryGetPlayerObject(player, out NetworkObject playerObject)) {
-                this.spawnedCharacters.Add(player, playerObject);
-            }
+            //Log.Info("Try store player obj.");
+            //if (this.networkRunner.TryGetPlayerObject(player, out NetworkObject playerObject)) {
+            //    Log.Info("Store player obj.");
+
+            //    this.spawnedCharacters.Add(player, playerObject);
+            //}
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -109,8 +121,15 @@ namespace MultiplayerTest
                 return;
             }
 
-            input.Set(this.inputData);
-            // Get input from the local player if exists.
+            if (!this.spawnedCharacters.TryGetValue(this.networkRunner.LocalPlayer, out NetworkObject localPlayerObject)) {
+                return;
+            }
+
+            LocalPlayerInputHandler localPlayerInput = localPlayerObject.GetComponent<LocalPlayerInputHandler>();
+
+            Log.Info("Get input from local player.");
+
+            input.Set(localPlayerInput.InputData);
         }
 
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
@@ -213,9 +232,9 @@ namespace MultiplayerTest
             address = NetAddress.LocalhostIPv4();
 
             // TODO delete this. This is just for being able to connect to the hosted server in the editor.
-            address = NetAddress.CreateFromIpPort(this.serverConfig.PublicIP, 9001);
+            // address = NetAddress.CreateFromIpPort(this.serverConfig.PublicIP, this.serverConfig.PublicPort);
 #elif GAME_CLIENT
-            address = NetAddress.CreateFromIpPort(this.serverConfig.IP, this.serverConfig.Port);
+            address = NetAddress.CreateFromIpPort(this.serverConfig.PublicIP, this.serverConfig.PublicPort);
 #endif
 
             this.isConnecting = true;
@@ -224,9 +243,9 @@ namespace MultiplayerTest
 
             StartGameResult result = await this.networkRunner.StartGame(new StartGameArgs() {
                 GameMode = GameMode.Client,
-                // SessionName = "localhost",
+                SessionName = this.serverConfig.SessionName,
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
-                //Address = address,
+                Address = address,
                 //CustomPublicAddress = externalAddr,
                 CustomPhotonAppSettings = photonSettings,
                 DisableClientSessionCreation = true
@@ -246,60 +265,26 @@ namespace MultiplayerTest
             }
         }
 
+        public void OnGamePlayerSpawned(GamePlayerSpawnedEvent e)
+        {
+            Log.Info("OnGamePlayerSpawned");
+
+            if (e.GamePlayerRef == null) {
+                return;
+            }
+
+            PlayerRef playerRef = e.GamePlayerRef.Object.InputAuthority;
+            if (this.spawnedCharacters.ContainsKey(playerRef)) {
+                this.spawnedCharacters[playerRef] = e.GamePlayerRef.Object;
+            }
+            else {
+                this.spawnedCharacters.Add(playerRef, e.GamePlayerRef.Object);
+            }
+        }
+
         public void SetAppReference(GameApp app)
         {
             this.appReference = app;
-        }
-
-        // TODO move this.
-#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
-        public void OnMove(InputValue value)
-        {
-            Vector2 inputValue = value.Get<Vector2>();
-            if (inputValue != Vector2.zero) {    
-                float targetRotation = Mathf.Atan2(inputValue.x, inputValue.y) * Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y;
-                Vector3 inputRotated = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
-                this.MoveInput(new Vector2(inputRotated.x, inputRotated.z));
-            }
-            else {
-                this.MoveInput(inputValue);
-            }
-        }
-
-        public void OnLook(InputValue value)
-        {
-            LookInput(value.Get<Vector2>());
-        }
-
-        public void OnJump(InputValue value)
-        {
-            this.JumpInput(value.isPressed);
-        }
-
-        public void OnSprint(InputValue value)
-        {
-            this.SprintInput(value.isPressed);
-        }
-#endif
-
-        public void MoveInput(Vector2 newMoveDirection)
-        {
-            this.inputData.MoveDirection = newMoveDirection;
-        }
-
-        public void LookInput(Vector2 newLookDirection)
-        {
-            this.inputData.LookInput = newLookDirection;
-        }
-
-        public void JumpInput(bool newJumpState)
-        {
-            this.inputData.Jump = newJumpState;
-        }
-
-        public void SprintInput(bool newSprintState)
-        {
-            this.inputData.Sprint = newSprintState;
         }
     }
 }

@@ -1,61 +1,52 @@
+using SLGFramework;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace MultiplayerTest
 {
-    public class LocalPlayerInputHandler : MonoBehaviour
+    public class LocalPlayerInputHandler : SLGBehaviour
     {
         private NetworkInputData inputData = new NetworkInputData();
 
-#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
-        public void OnMove(InputValue value)
+        private PFBFactory<LocalPlayerInputListener> inputListenerFactory = null;
+        private LocalPlayerInputListener inputListener = null;
+
+        public NetworkInputData InputData => this.inputData;
+
+        private void Awake()
         {
-            Vector2 inputValue = value.Get<Vector2>();
-            if (inputValue != Vector2.zero) {
-                // TODO don't use camera main.
-                float targetRotation = Mathf.Atan2(inputValue.x, inputValue.y) * Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y;
-                Vector3 inputRotated = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
-                this.MoveInput(new Vector2(inputRotated.x, inputRotated.z));
+            this.Initialize();
+        }
+
+        private void Start()
+        {
+            this.BeginPlay();
+        }
+
+        private void Update()
+        {
+            if (this.inputListener == null) {
+                return;
             }
-            else {
-                this.MoveInput(inputValue);
-            }
+
+            this.inputData.MoveDirection = this.inputListener.MoveInputValue;
+            this.inputData.LookDirection = this.inputListener.LookInputValue;
+            this.inputData.Jump = this.inputListener.JumpInputValue;
+            this.inputData.Sprint = this.inputListener.SprintInputValue;
         }
 
-        public void OnLook(InputValue value)
+        protected override void OnInitialize()
         {
-            LookInput(value.Get<Vector2>());
+            base.OnInitialize();
+
+            this.inputListenerFactory = new PFBFactory<LocalPlayerInputListener>();
         }
 
-        public void OnJump(InputValue value)
+        protected override void OnBeginPlay()
         {
-            this.JumpInput(value.isPressed);
-        }
+            base.OnBeginPlay();
 
-        public void OnSprint(InputValue value)
-        {
-            this.SprintInput(value.isPressed);
-        }
-#endif
-
-        public void MoveInput(Vector2 newMoveDirection)
-        {
-            this.inputData.MoveDirection = newMoveDirection;
-        }
-
-        public void LookInput(Vector2 newLookDirection)
-        {
-            this.inputData.LookInput = newLookDirection;
-        }
-
-        public void JumpInput(bool newJumpState)
-        {
-            this.inputData.Jump = newJumpState;
-        }
-
-        public void SprintInput(bool newSprintState)
-        {
-            this.inputData.Sprint = newSprintState;
+            this.inputListener = this.inputListenerFactory.CreateInstance(this.transform, Vector3.zero, Quaternion.identity);
         }
     }
 }

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5178289083940813202}
   - component: {fileID: 4388322903320289461}
   - component: {fileID: 302569454871775213}
+  - component: {fileID: 736892121628755215}
   m_Layer: 5
   m_Name: Session Name
   m_TagString: Untagged
@@ -36,7 +37,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 670, y: 100}
+  m_SizeDelta: {x: 0, y: 80.44}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4388322903320289461
 CanvasRenderer:
@@ -135,6 +136,26 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &736892121628755215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 461999481658202279}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: 470
+  m_MinHeight: -1
+  m_PreferredWidth: 470.52
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &1194178983262745582
 GameObject:
   m_ObjectHideFlags: 0
@@ -281,6 +302,7 @@ GameObject:
   - component: {fileID: 4230810319934457925}
   - component: {fileID: 7442025115160133661}
   - component: {fileID: 3044975458290780710}
+  - component: {fileID: 6408599302312241474}
   m_Layer: 5
   m_Name: Player Count
   m_TagString: Untagged
@@ -306,7 +328,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 670, y: 100}
+  m_SizeDelta: {x: 0, y: 80.44}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7442025115160133661
 CanvasRenderer:
@@ -405,6 +427,26 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &6408599302312241474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7083699558527338371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: 415
+  m_MinHeight: -1
+  m_PreferredWidth: 415.26
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &7771805477210277581
 GameObject:
   m_ObjectHideFlags: 0
@@ -417,6 +459,7 @@ GameObject:
   - component: {fileID: 7297252601405113695}
   - component: {fileID: 433082684639339450}
   - component: {fileID: 8475890546629520541}
+  - component: {fileID: 3920056951632671329}
   m_Layer: 5
   m_Name: Join Button
   m_TagString: Untagged
@@ -442,8 +485,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1676.6666, y: -50}
-  m_SizeDelta: {x: 300, y: 75}
+  m_AnchoredPosition: {x: 1185.78, y: -50}
+  m_SizeDelta: {x: 200, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7297252601405113695
 CanvasRenderer:
@@ -539,6 +582,26 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &3920056951632671329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7771805477210277581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: 100
+  m_MinHeight: -1
+  m_PreferredWidth: 200
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &8699386148218284641
 GameObject:
   m_ObjectHideFlags: 0
@@ -598,10 +661,10 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 3
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
+  m_Spacing: 100
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0

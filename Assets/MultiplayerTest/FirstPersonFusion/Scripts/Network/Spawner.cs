@@ -10,10 +10,11 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
     public NetworkPlayer playerPrefab;
 
     CharacterInputHandler characterInputHandler;
+    SessionListUIHandler sessionListUIHandler;
 
-    void Start()
+    void Awake()
     {
-        
+        sessionListUIHandler = FindObjectOfType<SessionListUIHandler>(true);
     }
 
     // Spawns players in the world
@@ -59,7 +60,28 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadStart(NetworkRunner runner) {}
 
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) {}
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+    {
+        if (sessionListUIHandler == null)
+            return;
+        
+        if (sessionList.Count == 0)
+        {
+            Debug.Log("OnSessionListUpdated: No sessions found");
+            sessionListUIHandler.OnNoSessionFound();
+        }
+        else
+        {
+            sessionListUIHandler.ClearList();
+
+            foreach (SessionInfo sessionInfo in sessionList)
+            {
+                sessionListUIHandler.AddToList(sessionInfo);
+                Debug.Log("OnSessionListUpdated: Found session: " + sessionInfo.Name);
+            }
+        }
+            
+    }
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {}
 

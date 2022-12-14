@@ -13,6 +13,11 @@ public class SessionListUIHandler : MonoBehaviour
     public GameObject sessionInfoListPrefab;
     public VerticalLayoutGroup verticalLayoutGroup;
 
+    private void Awake()
+    {
+        ClearList();
+    }
+
     public void ClearList()
     {
         foreach (Transform child in verticalLayoutGroup.transform)
@@ -32,19 +37,28 @@ public class SessionListUIHandler : MonoBehaviour
         sessionInfoListUI.OnJoinSession += AddedSessionInfoListUI_OnJoinSession;
     }
 
-    private void AddedSessionInfoListUI_OnJoinSession(SessionInfo obj)
+    private void AddedSessionInfoListUI_OnJoinSession(SessionInfo sessionInfo)
     {
-        
+        NetworkRunnerHandler networkRunnerHandler = FindObjectOfType<NetworkRunnerHandler>();
+
+        networkRunnerHandler.JoinGame(sessionInfo);
+
+        MainMenuUI mainMenuUI = FindObjectOfType<MainMenuUI>();
+        mainMenuUI.OnJoiningServer();
     }
 
     public void OnNoSessionFound()
     {
+        ClearList();
+
         statusText.text = "No Session Found";
         statusText.gameObject.SetActive(true);
     }
 
     public void OnLookingForSessions()
     {
+        ClearList();
+
         statusText.text = "Looking for Sessions";
         statusText.gameObject.SetActive(true);
     }

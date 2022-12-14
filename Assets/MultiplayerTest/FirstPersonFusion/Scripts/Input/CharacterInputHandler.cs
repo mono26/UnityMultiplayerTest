@@ -8,13 +8,16 @@ public class CharacterInputHandler : MonoBehaviour
     Vector2 moveInputVector = Vector2.zero;
     Vector2 viewInputVector = Vector2.zero;
     bool jumpRequest = false;
+    bool fireRequest = false;
 
     LocalCameraHandler localCameraHandler;
+    CharacterMovementHandler characterMovementHandler;
     StarterInputActions inputActions;
 
     void Awake()
     {
         localCameraHandler = GetComponentInChildren<LocalCameraHandler>();
+        characterMovementHandler = GetComponent<CharacterMovementHandler>();
         inputActions = new StarterInputActions();
     }
 
@@ -24,9 +27,10 @@ public class CharacterInputHandler : MonoBehaviour
         Cursor.visible = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        if (!characterMovementHandler.Object.HasInputAuthority) // Makes sure to run this only on the client been controlled
+            return;                                             // by the local player
         // Move Input  
         moveInputVector = inputActions.Player.Move.ReadValue<Vector2>();
 
@@ -36,6 +40,10 @@ public class CharacterInputHandler : MonoBehaviour
         // Jump Input
         if (inputActions.Player.Jump.triggered)
             jumpRequest = true;
+        
+        // Fire Input
+        if (inputActions.Player.Fire.triggered)
+            fireRequest = true;
         
         localCameraHandler.SetViewInputVector(viewInputVector);
     }
@@ -47,8 +55,10 @@ public class CharacterInputHandler : MonoBehaviour
         networkInputData.movementInput = moveInputVector;
         networkInputData.aimForwardVector = localCameraHandler.transform.forward; // Just sending the x axis for now
         networkInputData.jumpRequest = jumpRequest;
+        networkInputData.fireRequest = fireRequest;
 
         jumpRequest = false;
+        fireRequest = false;
 
         return networkInputData;
     }

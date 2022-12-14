@@ -21,9 +21,9 @@ namespace MultiplayerTest
 
         private bool isConnecting = false;
 
-        private ServerConfig serverConfig = null;
-
         private GameApp appReference = null;
+
+        private ServerConfig serverConfig = null;
 
         private GameRunner gameRunner = null;
         private PFBFactory<GameRunner> gameRunnerFactory = null;
@@ -85,7 +85,11 @@ namespace MultiplayerTest
 
             Log.Info("OnPlayerJoined");
 
-            this.CreatePlayer(player);
+            // Create a unique position for the player
+            Vector3 spawnPosition = new Vector3((player.RawEncoded % this.networkRunner.Config.Simulation.DefaultPlayers) * 3, 1, 0);
+            NetworkObject networkPlayerObject = this.ServerSpawn(this.playerPrefab, spawnPosition, Quaternion.identity, player);
+            // Keep track of the player avatars so we can remove it when they disconnect.
+            spawnedCharacters.Add(player, networkPlayerObject);
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -95,9 +99,9 @@ namespace MultiplayerTest
             }
 
             // Find and remove the players avatar
-            if (spawnedCharacters.TryGetValue(player, out NetworkObject networkObject)) {
-                runner.Despawn(networkObject);
-                spawnedCharacters.Remove(player);
+            if (this.spawnedCharacters.TryGetValue(player, out NetworkObject networkObject)) {
+                this.networkRunner.Despawn(networkObject);
+                this.spawnedCharacters.Remove(player);
             }
         }
 
@@ -171,20 +175,6 @@ namespace MultiplayerTest
 
         }
 
-        private void CreatePlayer(PlayerRef player)
-        {
-            if (this.playerPrefab == null) {
-                Log.Info("Need a player prefab for instantiation.");
-                return;
-            }
-
-            // Create a unique position for the player
-            Vector3 spawnPosition = new Vector3((player.RawEncoded % this.networkRunner.Config.Simulation.DefaultPlayers) * 3, 1, 0);
-            NetworkObject networkPlayerObject = this.networkRunner.Spawn(this.playerPrefab, spawnPosition, Quaternion.identity, player);
-            // Keep track of the player avatars so we can remove it when they disconnect
-            spawnedCharacters.Add(player, networkPlayerObject);
-        }
-
         public async void ConnectToNetwork()
         {
             Log.Info($"ConnectToNetwork");
@@ -255,6 +245,15 @@ namespace MultiplayerTest
         public void SetAppReference(GameApp app)
         {
             this.appReference = app;
+        }
+
+        public NetworkObject ServerSpawn(NetworkPrefabRef objectToSpawn, Vector3 position, Quaternion rotation, PlayerRef? owner)
+        {
+            if (objectToSpawn == null) {
+                return null;
+            }
+
+            return this.networkRunner.Spawn(objectToSpawn, position, rotation, owner);
         }
     }
 }

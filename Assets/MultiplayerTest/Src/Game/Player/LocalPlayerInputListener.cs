@@ -15,8 +15,6 @@ namespace MultiplayerTest
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
         public void OnMove(InputValue value)
         {
-            Log.Info("OnMove");
-
             Vector2 inputValue = value.Get<Vector2>();
             if (inputValue != Vector2.zero) {
                 // TODO don't use camera main.
@@ -31,8 +29,6 @@ namespace MultiplayerTest
 
         public void OnLook(InputValue value)
         {
-            Log.Info("OnLook");
-
             this.LookInput(value.Get<Vector2>());
         }
 

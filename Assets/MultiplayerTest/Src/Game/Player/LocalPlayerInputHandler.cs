@@ -1,6 +1,5 @@
 using SLGFramework;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace MultiplayerTest
 {

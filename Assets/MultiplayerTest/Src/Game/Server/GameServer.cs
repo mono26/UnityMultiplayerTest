@@ -21,13 +21,16 @@ namespace MultiplayerTest
 
         private bool isConnecting = false;
 
-        private NetworkRunner networkRunner = null;
-
-        private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+        private ServerConfig serverConfig = null;
 
         private GameApp appReference = null;
 
-        private ServerConfig serverConfig = null;
+        private GameRunner gameRunner = null;
+        private PFBFactory<GameRunner> gameRunnerFactory = null;
+
+        private NetworkRunner networkRunner = null;
+
+        private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
         private void Awake()
         {
@@ -57,6 +60,8 @@ namespace MultiplayerTest
             }
             this.networkRunner.ProvideInput = true;
             this.networkRunner.AddCallbacks(this);
+
+            this.gameRunnerFactory = new PFBFactory<GameRunner>();
         }
 
         protected override void OnBeginPlay()
@@ -214,7 +219,7 @@ namespace MultiplayerTest
             address = NetAddress.Any(this.serverConfig.Port);
 #endif
 
-            Log.Info($"Attempting to create server at {address}.");
+            Log.Info($"Attempting to create server at {address} and with config: {this.serverConfig}.");
 
             // Start Runner
             StartGameResult result = await this.networkRunner.StartGame(new StartGameArgs() {
@@ -226,8 +231,7 @@ namespace MultiplayerTest
                 Address = address,
                 CustomPublicAddress = externalAddr,
                 // CustomLobbyName = this.serverConfig.Lobby,
-                // CustomPhotonAppSettings = photonSettings,
-                PlayerCount = 4
+                CustomPhotonAppSettings = photonSettings
             });
 
             if (result.Ok) {
@@ -236,7 +240,7 @@ namespace MultiplayerTest
                 this.isConnecting = false;
 
                 // Initialize the instance in charge of handling game logic.
-                GameRunner.Instance.Initialize();
+                this.gameRunner = this.gameRunnerFactory.CreateInstance(this.transform, Vector3.zero, Quaternion.identity);
             }
             else {
                 // Quit the application if startup fails

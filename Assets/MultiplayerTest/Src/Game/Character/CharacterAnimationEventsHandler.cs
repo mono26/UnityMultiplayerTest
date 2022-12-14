@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace MultiplayerTest
 {
-    public class PlayerAnimationEventsHandler : SLGBehaviour
+    public class CharacterAnimationEventsHandler : SLGBehaviour
     {
         [SerializeField]
         private GameCharacterController characterController = null;

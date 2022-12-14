@@ -25,7 +25,7 @@ namespace MultiplayerTest
         {
             base.OnBeginPlay();
 
-            this.AppReference = this.gameAppFactory.CreateInstance(null, Vector3.zero, Quaternion.identity);
+            this.AppReference = this.gameAppFactory.CreateInstance(this.transform, Vector3.zero, Quaternion.identity);
         }
     }
 }

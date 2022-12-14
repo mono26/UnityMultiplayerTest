@@ -7,9 +7,6 @@ using Fusion;
 using SLGFramework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-#if GAME_SERVER
-using UnityEngine;
-#endif
 
 namespace MultiplayerTest
 {
@@ -26,6 +23,16 @@ namespace MultiplayerTest
 #endif
 
         public string AppVersion { get; private set; } = "1";
+
+        private void Awake()
+        {
+            this.Initialize();
+        }
+
+        private void Start()
+        {
+            this.BeginPlay();
+        }
 
         protected override void OnInitialize()
         {
@@ -51,11 +58,11 @@ namespace MultiplayerTest
             base.OnBeginPlay();
 
 #if GAME_SERVER
-            this.GameServer = this.gameServerFactory.CreateInstance(null, Vector3.zero, Quaternion.identity);
+            this.GameServer = this.gameServerFactory.CreateInstance(this.transform, Vector3.zero, Quaternion.identity);
             this.GameServer.SetAppReference(this);
             this.GameServer.Initialize();
 #elif GAME_CLIENT
-            this.GameClient = this.gameClientFactory.CreateInstance(null, Vector3.zero, Quaternion.identity);
+            this.GameClient = this.gameClientFactory.CreateInstance(this.transform, Vector3.zero, Quaternion.identity);
             this.GameClient.SetAppReference(this);
             this.GameClient.Initialize();
 #endif

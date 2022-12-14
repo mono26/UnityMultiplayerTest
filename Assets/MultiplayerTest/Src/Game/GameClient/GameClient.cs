@@ -4,6 +4,7 @@
 #endif
 
 using Fusion;
+using Fusion.Photon.Realtime;
 using Fusion.Sockets;
 using SLGFramework;
 using System;
@@ -17,20 +18,20 @@ namespace MultiplayerTest
 {
     public class GameClient : SLGBehaviour, INetworkRunnerCallbacks
     {
-        [SerializeField] 
-        private NetworkPrefabRef playerPrefab;
-
         private bool isConnecting = false;
 
-        private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+        private ServerConfig serverConfig = null;
 
         private GameApp appReference = null;
+
+        private GameRunner gameRunner = null;
+        private PFBFactory<GameRunner> gameRunnerFactory = null;
 
         private NetworkRunner networkRunner = null;
 
         private NetworkInputData inputData = new NetworkInputData();
 
-        private ServerConfig serverConfig = null;
+        private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
         private void Awake()
         {
@@ -65,6 +66,8 @@ namespace MultiplayerTest
             }
             this.networkRunner.ProvideInput = true;
             this.networkRunner.AddCallbacks(this);
+
+            this.gameRunnerFactory = new PFBFactory<GameRunner>();
         }
 
         protected override void OnBeginPlay()
@@ -107,6 +110,7 @@ namespace MultiplayerTest
             }
 
             input.Set(this.inputData);
+            // Get input from the local player if exists.
         }
 
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
@@ -185,6 +189,13 @@ namespace MultiplayerTest
         {
             this.serverConfig = ServerConfig.Resolve();
 
+            // Build Custom Photon Config
+            AppSettings photonSettings = PhotonAppSettings.Instance.AppSettings.GetCopy();
+
+            if (string.IsNullOrEmpty(this.serverConfig.Region) == false) {
+                photonSettings.FixedRegion = this.serverConfig.Region.ToLower();
+            }
+
             // Build Custom External Addr
             NetAddress? externalAddr = null;
 
@@ -200,22 +211,25 @@ namespace MultiplayerTest
             NetAddress address;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             address = NetAddress.LocalhostIPv4();
-            //address = NetAddress.CreateFromIpPort(this.serverConfig.IP, this.serverConfig.Port);
+
+            // TODO delete this. This is just for being able to connect to the hosted server in the editor.
+            address = NetAddress.CreateFromIpPort(this.serverConfig.PublicIP, 9001);
 #elif GAME_CLIENT
             address = NetAddress.CreateFromIpPort(this.serverConfig.IP, this.serverConfig.Port);
 #endif
 
             this.isConnecting = true;
 
-            Log.Info($"Attempting to join server at {address}.");
+            Log.Info($"Attempting to join server at {address} and with config: {this.serverConfig}.");
 
             StartGameResult result = await this.networkRunner.StartGame(new StartGameArgs() {
                 GameMode = GameMode.Client,
                 // SessionName = "localhost",
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
-                Address = address,
-                CustomPublicAddress = externalAddr,
-                DisableClientSessionCreation = true,
+                //Address = address,
+                //CustomPublicAddress = externalAddr,
+                CustomPhotonAppSettings = photonSettings,
+                DisableClientSessionCreation = true
             });
 
             if (result.Ok) {
@@ -224,7 +238,7 @@ namespace MultiplayerTest
                 this.isConnecting = false;
 
                 // Initialize the instance in charge of handling game logic.
-                GameRunner.Instance.Initialize();
+                this.gameRunner = this.gameRunnerFactory.CreateInstance(this.transform, Vector3.zero, Quaternion.identity);
             }
             else {
                 // Quit the application if startup fails

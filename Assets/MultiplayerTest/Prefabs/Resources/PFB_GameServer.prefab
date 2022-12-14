@@ -8,18 +8,18 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 12214664442037021}
+  - component: {fileID: 7441990623589373762}
   - component: {fileID: 8286008181780175771}
   - component: {fileID: 8988924859412894053}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: PFB_GameServer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &12214664442037021
-RectTransform:
+--- !u!4 &7441990623589373762
+Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -33,11 +33,6 @@ RectTransform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0, y: 0}
 --- !u!114 &8286008181780175771
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62,6 +57,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98c44a0ffe9fb274fac00808837563b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxPlayersPerRoom: 4
   playerPrefab:
     RawGuidValue: 36b626a681cbc854aab7de6d28101756

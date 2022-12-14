@@ -123,7 +123,7 @@ public class HPHandler : NetworkBehaviour
 
     private void OnDeath()
     {
-        playerModel.SetActive(false);
+        playerModel.gameObject.SetActive(false);
         hitboxRoot.HitboxRootActive = false;
         characterMovementHandler.SetCharacterControllerEnabled(false);
 
@@ -135,7 +135,7 @@ public class HPHandler : NetworkBehaviour
         if (Object.HasInputAuthority)
             uiOnHitImage.color = Color.clear;
         
-        playerModel.SetActive(true);
+        playerModel.gameObject.SetActive(true);
         hitboxRoot.HitboxRootActive = true;
         characterMovementHandler.SetCharacterControllerEnabled(true);
     }

@@ -22,7 +22,7 @@ namespace MultiplayerTest
             this.BeginPlay();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (this.inputListener == null) {
                 return;
@@ -32,6 +32,7 @@ namespace MultiplayerTest
             this.inputData.LookDirection = this.inputListener.LookInputValue;
             this.inputData.Jump = this.inputListener.JumpInputValue;
             this.inputData.Sprint = this.inputListener.SprintInputValue;
+            this.inputData.Action = this.inputListener.ActionInputValue;
         }
 
         protected override void OnInitialize()

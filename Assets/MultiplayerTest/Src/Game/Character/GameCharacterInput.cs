@@ -10,6 +10,9 @@ namespace MultiplayerTest
         public bool jump = false;
         public bool sprint = false;
 
+        [Header("Action Input Values")]
+        public bool action = false;
+
         [Header("Movement Settings")]
         public bool analogMovement = false;
 
@@ -39,6 +42,11 @@ namespace MultiplayerTest
         public void SprintInput(bool newSprintState)
         {
             this.sprint = newSprintState;
+        }
+
+        public void ActionInput(bool newActionInput)
+        {
+            this.action = newActionInput;
         }
 
         private void OnApplicationFocus(bool hasFocus)

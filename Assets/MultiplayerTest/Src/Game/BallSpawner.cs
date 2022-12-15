@@ -13,42 +13,37 @@ namespace MultiplayerTest
         [SerializeField]
         private NetworkPrefabRef ballPrefab;
 
-        private float spawnTime = 3.0f;
-        private float currentTimmer = 0.0f;
+        private InteractableComponent interactableComponent = null;
+
+        private void Awake()
+        {
+            this.OnInitialize();
+        }
 
         private void Start()
         {
             this.BeginPlay();
         }
 
-#if GAME_CLIENT
-        private void Update()
+        protected override void OnInitialize()
         {
-            if (this.currentTimmer > 0.0f) {
-                this.currentTimmer -= Time.fixedDeltaTime;
+            base.OnInitialize();
+
+            this.interactableComponent = this.GetComponent<InteractableComponent>();
+            this.interactableComponent.OnTriggerInteraction.AddListener(this.OnInteractedWithComponent);
+        }
+
+        public void OnInteractedWithComponent(InteractableComponent component)
+        {
+            if (component == null || this.interactableComponent != component) {
                 return;
             }
 
-            this.OnInteracted();
-
-            this.currentTimmer = this.spawnTime;
-        }
-#endif
-
-        protected override void OnBeginPlay()
-        {
-            base.OnBeginPlay();
-
-            this.currentTimmer = this.spawnTime;
-        }
-
-        public void OnInteracted()
-        {
-            this.RPC_OnInteracted();
+            this.RPC_SpawnPhysicsBall();
         }
 
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-        private void RPC_OnInteracted()
+        private void RPC_SpawnPhysicsBall()
         {
 #if GAME_SERVER
             GameServer server = AppWrapper.Instance.AppReference.GameServer;

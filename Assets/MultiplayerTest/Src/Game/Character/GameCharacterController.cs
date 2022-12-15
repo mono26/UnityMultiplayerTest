@@ -152,6 +152,22 @@ namespace MultiplayerTest
             this.RotateCameraRoot();
         }
 
+        private void OnDrawGizmosSelected()
+        {
+            Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
+            Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
+
+            if (Grounded) {
+                Gizmos.color = transparentGreen;
+            }
+            else {
+                Gizmos.color = transparentRed;
+            }
+
+            // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
+            Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
+        }
+
         protected override void OnInitialize()
         {
             base.OnInitialize();
@@ -350,22 +366,6 @@ namespace MultiplayerTest
             if (lfAngle < -360f) lfAngle += 360f;
             if (lfAngle > 360f) lfAngle -= 360f;
             return Mathf.Clamp(lfAngle, lfMin, lfMax);
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
-            Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
-
-            if (Grounded) {
-                Gizmos.color = transparentGreen;
-            }
-            else {
-                Gizmos.color = transparentRed;
-            }
-
-            // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
-            Gizmos.DrawSphere( new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
         }
 
         public void OnFootstep(AnimationEvent animationEvent)

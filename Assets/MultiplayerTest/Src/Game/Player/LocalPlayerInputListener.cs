@@ -11,6 +11,7 @@ namespace MultiplayerTest
         public Vector2 LookInputValue { get; private set; }
         public bool SprintInputValue { get; private set; }
         public bool JumpInputValue { get; private set; }
+        public bool ActionInputValue { get; private set; }
 
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
         public void OnMove(InputValue value)
@@ -41,6 +42,11 @@ namespace MultiplayerTest
         {
             this.SprintInput(value.isPressed);
         }
+
+        public void OnAction(InputValue value)
+        {
+            this.ActionInput(value.isPressed);
+        }
 #endif
 
         public void MoveInput(Vector2 newMoveDirection)
@@ -61,6 +67,11 @@ namespace MultiplayerTest
         public void SprintInput(bool newSprintState)
         {
             this.SprintInputValue = newSprintState;
+        }
+
+        public void ActionInput(bool newActionState)
+        {
+            this.ActionInputValue = newActionState;
         }
     }
 }

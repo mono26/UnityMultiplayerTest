@@ -21,6 +21,7 @@ namespace MultiplayerTest
                 this.input.LookInput(data.LookDirection);
                 this.input.JumpInput(data.Jump);
                 this.input.SprintInput(data.Sprint);
+                this.input.ActionInput(data.Action);
             }
         }
 

@@ -127,8 +127,6 @@ namespace MultiplayerTest
 
             LocalPlayerInputHandler localPlayerInput = localPlayerObject.GetComponent<LocalPlayerInputHandler>();
 
-            Log.Info("Get input from local player.");
-
             input.Set(localPlayerInput.InputData);
         }
 

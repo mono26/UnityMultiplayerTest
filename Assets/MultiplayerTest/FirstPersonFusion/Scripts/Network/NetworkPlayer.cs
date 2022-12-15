@@ -42,12 +42,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
         else
         {
             Camera localcamera = GetComponentInChildren<Camera>();
-            localcamera.enabled = false;
-
-            AudioListener audioListener = GetComponentInChildren<AudioListener>();
-            audioListener.enabled = false;
-
-            localUI.SetActive(false);
+            Destroy(localcamera.gameObject);
 
             Debug.Log("Spawned remote player");
         }

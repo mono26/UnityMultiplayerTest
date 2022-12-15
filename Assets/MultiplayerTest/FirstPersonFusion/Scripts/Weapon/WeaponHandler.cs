@@ -32,7 +32,9 @@ public class WeaponHandler : NetworkBehaviour
         if (GetInput(out NetworkInputData inputData))
         {
             if (inputData.fireRequest)
+            {
                 Fire(inputData.aimForwardVector);
+            }
         }
     }
 
@@ -41,9 +43,9 @@ public class WeaponHandler : NetworkBehaviour
         if (Time.time - lastTimeFired < 0.15f)
             return;
         
-        StartCoroutine(FireEffect());
-
         Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, 100, Object.InputAuthority, out var hitInfo, collisionLayers, HitOptions.IncludePhysX);
+
+        StartCoroutine(FireEffect(aimForwardVector));
 
         float hitDistance = 100;
         bool isHitOtherPlayer = false;
@@ -71,9 +73,10 @@ public class WeaponHandler : NetworkBehaviour
         lastTimeFired = Time.time;
     }
 
-    IEnumerator FireEffect()
+    IEnumerator FireEffect(Vector3 aimForwardVector)
     {
         isFiring = true;
+        fireParticleSystem.transform.rotation = Quaternion.LookRotation(aimForwardVector);
         fireParticleSystem.Play();
 
         yield return new WaitForSeconds(0.09f);
@@ -95,6 +98,8 @@ public class WeaponHandler : NetworkBehaviour
     void OnFireRemote()
     {
         if (!Object.HasInputAuthority)
+        {
             fireParticleSystem.Play();
+        }
     }
 }

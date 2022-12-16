@@ -10,7 +10,7 @@ public class LocalCameraHandler : MonoBehaviour
     float cameraRotationX = 0f;
     float cameraRotationY = 0f;
 
-    Camera localCamera;
+    public Camera localCamera;
     NetworkCharacterControllerPrototypeCustom characterController;
 
     void Awake()
@@ -21,8 +21,8 @@ public class LocalCameraHandler : MonoBehaviour
 
     void Start()
     {
-        if (localCamera.enabled)
-            localCamera.transform.parent = null;
+        cameraRotationX = GameManager.instance.cameraViewRotation.x;
+        cameraRotationY = GameManager.instance.cameraViewRotation.y;
     }
 
     // Update is called once per frame
@@ -44,5 +44,11 @@ public class LocalCameraHandler : MonoBehaviour
     public void SetViewInputVector(Vector2 viewInput)
     {
         this.viewInput = viewInput;
+    }
+
+    private void OnDestroy()
+    {
+        if (cameraRotationX != 0f || cameraRotationY != 0f)
+            GameManager.instance.cameraViewRotation = new Vector2(cameraRotationX, cameraRotationY);
     }
 }

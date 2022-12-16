@@ -15,6 +15,8 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
     [Networked(OnChanged = nameof(OnNickNameChanged))]
     public NetworkString<_16> nickName { get; set; }
 
+    [Networked] public int token { get; set; }
+
     bool isPublicJoinMessageSent = false;
 
     NetworkInGameMessages networkInGameMessages;
@@ -33,16 +35,30 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
         {
             Local = this;
 
-            Camera.main.gameObject.SetActive(false);
+            if (Camera.main != null)
+                Camera.main.gameObject.SetActive(false);
 
-            RPC_SetNickName(PlayerPrefs.GetString("NickName", $"P_{Object.Id}"));
+            AudioListener audioListener = GetComponentInChildren<AudioListener>(true);
+            audioListener.enabled = true;
+            
+            localCameraHandler.localCamera.enabled = true;
+            localCameraHandler.transform.parent = null;
+
+            localUI.SetActive(true);
+
+            RPC_SetNickName(GameManager.instance.playerNickName);
 
             Debug.Log("Spawned local player");
         }
         else
         {
-            Camera localcamera = GetComponentInChildren<Camera>();
-            Destroy(localcamera.gameObject);
+            /* Camera localcamera = GetComponentInChildren<Camera>();
+            Destroy(localcamera.gameObject); */
+            localCameraHandler.localCamera.enabled = false;
+            localUI.SetActive(false);
+
+            AudioListener audioListener = GetComponentInChildren<AudioListener>();
+            audioListener.enabled = false;
 
             Debug.Log("Spawned remote player");
         }
@@ -65,7 +81,6 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 
         if (player == Object.InputAuthority)
             Runner.Despawn(Object);
-        
     }
 
     static void OnNickNameChanged(Changed<NetworkPlayer> changed)
@@ -89,5 +104,11 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 
             isPublicJoinMessageSent = true;
         }
+    }
+
+    void OnDestroy()
+    {
+        if (localCameraHandler != null)
+            Destroy(localCameraHandler.gameObject);
     }
 }

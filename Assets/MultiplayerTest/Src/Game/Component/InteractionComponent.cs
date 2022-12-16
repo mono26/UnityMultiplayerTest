@@ -45,6 +45,8 @@ namespace MultiplayerTest
 
         private void OnTriggerEnter(Collider other)
         {
+            Log.Info("OnTriggerEnter");
+
             if (!other.TryGetComponent(out InteractableComponent interactable)) {
                 return;
             }
@@ -60,6 +62,8 @@ namespace MultiplayerTest
 
         private void OnTriggerExit(Collider other)
         {
+            Log.Info("OnTriggerExit");
+
             if (!other.TryGetComponent(out InteractableComponent interactable)) {
                 return;
             }
@@ -67,6 +71,8 @@ namespace MultiplayerTest
             if (!this.interactables.Contains(interactable)) {
                 return;
             }
+
+            Log.Info("Interactable exited.");
 
             this.interactables.Remove(interactable);
         }

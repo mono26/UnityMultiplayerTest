@@ -20,6 +20,8 @@ namespace MultiplayerTest
 
         private void OnTriggerEnter(Collider other)
         {
+            Log.Info("OnTriggerEnter");
+
             if (!other.TryGetComponent(out InteractionComponent interactor)) {
                 return;
             }
@@ -35,6 +37,8 @@ namespace MultiplayerTest
 
         private void OnTriggerExit(Collider other)
         {
+            Log.Info("OnTriggerExit");
+
             if (!other.TryGetComponent(out InteractionComponent interactor)) {
                 return;
             }
@@ -42,6 +46,8 @@ namespace MultiplayerTest
             if (!this.interactors.Contains(interactor)) {
                 return;
             }
+
+            Log.Info("Interactor exited.");
 
             this.interactors.Remove(interactor);
         }

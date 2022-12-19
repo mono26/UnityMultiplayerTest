@@ -28,9 +28,9 @@ namespace MultiplayerTest
         private GameRunner gameRunner = null;
         private PFBFactory<GameRunner> gameRunnerFactory = null;
 
-        private NetworkRunner networkRunner = null;
-
         private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+
+        public NetworkRunner NetworkRunner { get; private set; } = null;
 
         private void Awake()
         {
@@ -42,24 +42,21 @@ namespace MultiplayerTest
             this.BeginPlay();
         }
 
-        private void OnGUI()
-        {
-            if (GUI.Button(new Rect(0, 0, 200, 40), "Create Server")) {
-                this.ConnectToNetwork();
-            }
-        }
-
         protected override void OnInitialize()
         {
             Log.Info("Initialize GameServer");
 
             base.OnInitialize();
 
-            if (!this.TryGetComponent<NetworkRunner>(out this.networkRunner)) {
-                this.networkRunner = this.gameObject.AddComponent<NetworkRunner>();
+            NetworkRunner runner = null;
+            if (!this.TryGetComponent<NetworkRunner>(out runner)) {
+                runner = this.gameObject.AddComponent<NetworkRunner>();
             }
-            this.networkRunner.ProvideInput = true;
-            this.networkRunner.AddCallbacks(this);
+
+            this.NetworkRunner = runner;
+
+            this.NetworkRunner.ProvideInput = true;
+            this.NetworkRunner.AddCallbacks(this);
 
             this.gameRunnerFactory = new PFBFactory<GameRunner>();
         }
@@ -79,14 +76,14 @@ namespace MultiplayerTest
 
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
-            if (this.networkRunner != runner || !this.networkRunner.IsServer) {
+            if (this.NetworkRunner != runner || !this.NetworkRunner.IsServer) {
                 return;
             }
 
             Log.Info("OnPlayerJoined");
 
             // Create a unique position for the player
-            Vector3 spawnPosition = new Vector3((player.RawEncoded % this.networkRunner.Config.Simulation.DefaultPlayers) * 3, 1, 0);
+            Vector3 spawnPosition = new Vector3((player.RawEncoded % this.NetworkRunner.Config.Simulation.DefaultPlayers) * 3, 1, 0);
             NetworkObject networkPlayerObject = this.ServerSpawn(this.playerPrefab, spawnPosition, Quaternion.identity, player);
             // Keep track of the player avatars so we can remove it when they disconnect.
             spawnedCharacters.Add(player, networkPlayerObject);
@@ -94,13 +91,13 @@ namespace MultiplayerTest
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            if (this.networkRunner != runner || !this.networkRunner.IsServer) {
+            if (this.NetworkRunner != runner || !this.NetworkRunner.IsServer) {
                 return;
             }
 
             // Find and remove the players avatar
             if (this.spawnedCharacters.TryGetValue(player, out NetworkObject networkObject)) {
-                this.networkRunner.Despawn(networkObject);
+                this.NetworkRunner.Despawn(networkObject);
                 this.spawnedCharacters.Remove(player);
             }
         }
@@ -211,11 +208,13 @@ namespace MultiplayerTest
 
             Log.Info($"Attempting to create server at {address} and with config: {this.serverConfig}.");
 
+            this.NetworkRunner.ProvideInput = false;
+
             // Start Runner
-            StartGameResult result = await this.networkRunner.StartGame(new StartGameArgs() {
+            StartGameResult result = await this.NetworkRunner.StartGame(new StartGameArgs() {
                 SessionName = this.serverConfig.SessionName,
                 GameMode = GameMode.Server,
-                SceneManager = this.networkRunner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
+                SceneManager = this.NetworkRunner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
                 Scene = 2,
                 SessionProperties = this.serverConfig.SessionProperties,
                 Address = address,
@@ -253,7 +252,7 @@ namespace MultiplayerTest
                 return null;
             }
 
-            return this.networkRunner.Spawn(objectToSpawn, position, rotation, owner);
+            return this.NetworkRunner.Spawn(objectToSpawn, position, rotation, owner);
         }
     }
 }

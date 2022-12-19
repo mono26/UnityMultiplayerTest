@@ -3,7 +3,6 @@
 #undef GAME_CLIENT
 #endif
 
-using Fusion;
 using SLGFramework;
 using UnityEngine;
 
@@ -217,10 +216,16 @@ namespace MultiplayerTest
 
         private void RotateCameraRoot()
         {
+#if GAME_SERVER
+            float deltaTime = AppWrapper.Instance.AppReference.GameServer.NetworkRunner.DeltaTime;
+#elif GAME_CLIENT
+            float deltaTime = Time.fixedDeltaTime;
+#endif
+
             // if there is an this.input and camera position is not fixed
             if (this.input.look.sqrMagnitude >= _threshold && !LockCameraPosition) {
                 //Don't multiply mouse this.input by Time.fixedDeltaTime;
-                float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
+                float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : deltaTime;
 
                 this.cinemachineTargetYaw += this.input.look.x * deltaTimeMultiplier;
                 this.cinemachineTargetPitch += this.input.look.y * deltaTimeMultiplier;
@@ -237,6 +242,12 @@ namespace MultiplayerTest
 
         private void Move()
         {
+#if GAME_SERVER
+            float deltaTime = AppWrapper.Instance.AppReference.GameServer.NetworkRunner.DeltaTime;
+#elif GAME_CLIENT
+            float deltaTime = Time.fixedDeltaTime;
+#endif
+
             // set target this.speed based on move this.speed, sprint this.speed and if sprint is pressed
             float targetSpeed = this.input.sprint ? SprintSpeed : MoveSpeed;
 
@@ -261,7 +272,7 @@ namespace MultiplayerTest
                 // creates curved result rather than a linear one giving a more organic this.speed change
                 // note T in Lerp is clamped, so we don't need to clamp our this.speed
                 this.speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
-                    Time.fixedDeltaTime * SpeedChangeRate);
+                    deltaTime * SpeedChangeRate);
 
                 // round this.speed to 3 decimal places
                 this.speed = Mathf.Round(this.speed * 1000f) / 1000f;
@@ -270,7 +281,7 @@ namespace MultiplayerTest
                 this.speed = targetSpeed;
             }
 
-            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.fixedDeltaTime * SpeedChangeRate);
+            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, deltaTime * SpeedChangeRate);
             if (_animationBlend < 0.01f) _animationBlend = 0f;
 
             // normalise this.input direction
@@ -290,7 +301,7 @@ namespace MultiplayerTest
 
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
             // move the player
-            Vector3 movementVector = targetDirection.normalized * (this.speed * Time.fixedDeltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.fixedDeltaTime;
+            Vector3 movementVector = targetDirection.normalized * (this.speed * deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * deltaTime;
 
 #if GAME_SERVER
             this.characterController.Move(movementVector);
@@ -305,6 +316,12 @@ namespace MultiplayerTest
 
         private void JumpAndGravity()
         {
+#if GAME_SERVER
+            float deltaTime = AppWrapper.Instance.AppReference.GameServer.NetworkRunner.DeltaTime;
+#elif GAME_CLIENT
+            float deltaTime = Time.fixedDeltaTime;
+#endif
+
             if (Grounded) {
                 // reset the fall timeout timer
                 _fallTimeoutDelta = FallTimeout;
@@ -333,7 +350,7 @@ namespace MultiplayerTest
 
                 // jump timeout
                 if (_jumpTimeoutDelta >= 0.0f) {
-                    _jumpTimeoutDelta -= Time.fixedDeltaTime;
+                    _jumpTimeoutDelta -= deltaTime;
                 }
             }
             else {
@@ -342,7 +359,7 @@ namespace MultiplayerTest
 
                 // fall timeout
                 if (_fallTimeoutDelta >= 0.0f) {
-                    _fallTimeoutDelta -= Time.fixedDeltaTime;
+                    _fallTimeoutDelta -= deltaTime;
                 }
                 else {
                     // update animator if using character
@@ -357,7 +374,7 @@ namespace MultiplayerTest
 
             // apply gravity over time if under terminal (multiply by delta time twice to linearly this.speed up over time)
             if (_verticalVelocity < _terminalVelocity) {
-                _verticalVelocity += Gravity * Time.fixedDeltaTime;
+                _verticalVelocity += Gravity * deltaTime;
             }
         }
 

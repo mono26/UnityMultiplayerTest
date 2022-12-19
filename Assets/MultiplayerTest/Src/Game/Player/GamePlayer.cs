@@ -1,10 +1,14 @@
 using SLGFramework;
+using Unity.VisualScripting;
 using UnityEngine.InputSystem;
 
 namespace MultiplayerTest
 {
     public class GamePlayer : SLGNetworkBehaviour
     {
+        private NetworkCharacterControllerPrototype characterController = null;
+        private GameCharacterTransformController characterTransformController = null;
+
         private GameCharacterInput input = null;
 
         private void Awake()
@@ -22,6 +26,9 @@ namespace MultiplayerTest
                 this.input.JumpInput(data.Jump);
                 this.input.SprintInput(data.Sprint);
                 this.input.ActionInput(data.Action);
+
+                data.MoveDirection.Normalize();
+                // this.characterController.Move(data.MoveDirection * Runner.DeltaTime);
             }
         }
 
@@ -29,7 +36,7 @@ namespace MultiplayerTest
         {
             base.Spawned();
 
-            if (!Object.HasInputAuthority) {
+            if (!this.Object.HasInputAuthority) {
                 return;
             }
 
@@ -44,6 +51,8 @@ namespace MultiplayerTest
             base.OnInitialize();
 
             this.input = this.GetComponent<GameCharacterInput>();
+            this.characterController = this.GetComponent<NetworkCharacterControllerPrototype>();
+            this.characterTransformController = this.GetComponent<GameCharacterTransformController>();
         }
     }
 }

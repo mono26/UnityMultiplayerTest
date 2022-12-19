@@ -228,7 +228,6 @@ namespace MultiplayerTest
             NetAddress address;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             address = NetAddress.LocalhostIPv4();
-
             // TODO delete this. This is just for being able to connect to the hosted server in the editor.
             // address = NetAddress.CreateFromIpPort(this.serverConfig.PublicIP, this.serverConfig.PublicPort);
 #elif GAME_CLIENT

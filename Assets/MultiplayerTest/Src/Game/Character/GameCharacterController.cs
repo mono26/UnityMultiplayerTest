@@ -248,6 +248,12 @@ namespace MultiplayerTest
             float deltaTime = Time.fixedDeltaTime;
 #endif
 
+#if GAME_SERVER
+            Vector3 movementInput = Vector3.zero;
+#elif GAME_CLIENT
+            Vector3 movementInput = Vector3.zero;
+#endif
+
             // set target this.speed based on move this.speed, sprint this.speed and if sprint is pressed
             float targetSpeed = this.input.sprint ? SprintSpeed : MoveSpeed;
 

@@ -35,11 +35,6 @@ namespace MultiplayerTest
             this.Initialize();
         }
 
-        private void Start()
-        {
-            this.BeginPlay();   
-        }
-
         private void OnDestroy()
         {
             if (!AppWrapper.HasInstance()) {
@@ -48,18 +43,6 @@ namespace MultiplayerTest
 
             AppWrapper.Instance.AppReference.ServiceProvider.GetService<IEventManager>().RemoveListener<GamePlayerSpawnedEvent>(this.OnGamePlayerSpawned);
         }
-
-#if UNITY_EDITOR
-        //private void OnGUI()
-        //{
-        //    if (GUI.Button(new Rect(0, 0, 200, 40), "Host")) {
-        //        this.ConnectToRoom(GameMode.Host);
-        //    }
-        //    if (GUI.Button(new Rect(0, 40, 200, 40), "Join")) {
-        //        this.ConnectToRoom(GameMode.Client);
-        //    }
-        //}
-#endif
 
         protected override void OnInitialize()
         {
@@ -78,28 +61,9 @@ namespace MultiplayerTest
             AppWrapper.Instance.AppReference.ServiceProvider.GetService<IEventManager>().AddListener<GamePlayerSpawnedEvent>(this.OnGamePlayerSpawned);
         }
 
-        protected override void OnBeginPlay()
-        {
-            base.OnBeginPlay();
-
-            // Initialize the instance in charge of handling game logic.
-            // this.ConnectToServer();
-        }
-
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
             Debug.Log("OnPlayerJoined");
-
-            if (this.networkRunner != runner) {
-                return;
-            }
-
-            //Log.Info("Try store player obj.");
-            //if (this.networkRunner.TryGetPlayerObject(player, out NetworkObject playerObject)) {
-            //    Log.Info("Store player obj.");
-
-            //    this.spawnedCharacters.Add(player, playerObject);
-            //}
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)

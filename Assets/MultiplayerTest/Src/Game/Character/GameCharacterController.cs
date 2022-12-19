@@ -78,15 +78,15 @@ namespace MultiplayerTest
 
         // player
         private float speed = 0.0f;
-        private float _animationBlend;
-        private float _targetRotation = 0.0f;
-        private float _rotationVelocity;
-        private float _verticalVelocity;
-        private float _terminalVelocity = 53.0f;
+        private float animationBlend = 0.0f;
+        private float targetRotation = 0.0f;
+        private float rotationVelocity = 0.0f;
+        private float verticalVelocity = 0.0f;
+        private float terminalVelocity = 53.0f;
 
         // timeout deltatime
-        private float _jumpTimeoutDelta;
-        private float _fallTimeoutDelta;
+        private float jumpTimeoutDelta = 0.0f;
+        private float fallTimeoutDelta = 0.0f;
 
         // animation IDs
         private int _animIDSpeed;
@@ -104,6 +104,10 @@ namespace MultiplayerTest
         private const float _threshold = 0.01f;
 
         private bool hasAnimator = false;
+
+#if GAME_CLIENT
+        private Vector3 lastPosition = Vector3.zero;
+#endif
 
         private bool IsCurrentDeviceMouse
         {
@@ -184,11 +188,15 @@ namespace MultiplayerTest
 
             this.hasAnimator = this.TryGetComponent(out this.animatorRef) || this.transform.GetChild(0).TryGetComponent(out this.animatorRef);
 
-            AssignAnimationIDs();
+            this.AssignAnimationIDs();
 
             // reset our timeouts on start
-            _jumpTimeoutDelta = JumpTimeout;
-            _fallTimeoutDelta = FallTimeout;
+            this.jumpTimeoutDelta = JumpTimeout;
+            this.fallTimeoutDelta = FallTimeout;
+
+#if GAME_CLIENT
+            this.lastPosition = this.transform.position;
+#endif
         }
 
         private void AssignAnimationIDs()
@@ -249,9 +257,9 @@ namespace MultiplayerTest
 #endif
 
 #if GAME_SERVER
-            Vector3 movementInput = Vector3.zero;
+            Vector3 movementInput = new Vector3(this.input.move.x, 0, this.input.move.y);
 #elif GAME_CLIENT
-            Vector3 movementInput = Vector3.zero;
+            Vector3 movementInput = this.transform.position - this.lastPosition;
 #endif
 
             // set target this.speed based on move this.speed, sprint this.speed and if sprint is pressed
@@ -259,9 +267,9 @@ namespace MultiplayerTest
 
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
-            // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
+            // note: Vector3's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is no this.input, set the target this.speed to 0
-            if (this.input.move == Vector2.zero) {
+            if (movementInput == Vector3.zero) {
                 targetSpeed = 0.0f;
             }
 
@@ -270,7 +278,7 @@ namespace MultiplayerTest
             float currentHorizontalSpeed = new Vector3(this.characterController.Velocity.x, 0.0f, this.characterController.Velocity.z).magnitude;
 
             float speedOffset = 0.1f;
-            float inputMagnitude = this.input.analogMovement ? this.input.move.magnitude : 1f;
+            float inputMagnitude = this.input.analogMovement ? movementInput.magnitude : 1f;
 
             // accelerate or decelerate to target this.speed
             if (currentHorizontalSpeed < targetSpeed - speedOffset ||
@@ -287,35 +295,39 @@ namespace MultiplayerTest
                 this.speed = targetSpeed;
             }
 
-            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, deltaTime * SpeedChangeRate);
-            if (_animationBlend < 0.01f) _animationBlend = 0f;
+            this.animationBlend = Mathf.Lerp(this.animationBlend, targetSpeed, deltaTime * SpeedChangeRate);
+            if (this.animationBlend < 0.01f) {
+                this.animationBlend = 0f;
+            }
 
             // normalise this.input direction
-            Vector3 inputDirection = new Vector3(this.input.move.x, 0.0f, this.input.move.y).normalized;
+            Vector3 inputDirection = movementInput.normalized;
 
             // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is a move this.input rotate player when the player is moving
-            if (this.input.move != Vector2.zero) {
-                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg;
-                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, RotationSmoothTime);
+            if (movementInput != Vector3.zero) {
+                this.targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg;
+                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, this.targetRotation, ref this.rotationVelocity, RotationSmoothTime);
 
 #if GAME_SERVER
                 // rotate to face this.input direction relative to camera position
-                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                this.transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
 #endif
             }
 
-            Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+            Vector3 targetDirection = Quaternion.Euler(0.0f, this.targetRotation, 0.0f) * Vector3.forward;
             // move the player
-            Vector3 movementVector = targetDirection.normalized * (this.speed * deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * deltaTime;
+            Vector3 movementVector = targetDirection.normalized * (this.speed * deltaTime) + new Vector3(0.0f, this.verticalVelocity, 0.0f) * deltaTime;
 
 #if GAME_SERVER
             this.characterController.Move(movementVector);
+#elif GAME_CLIENT
+            this.lastPosition = this.transform.position;
 #endif
 
             // update animator if using character
             if (this.hasAnimator) {
-                this.animatorRef.SetFloat(_animIDSpeed, _animationBlend);
+                this.animatorRef.SetFloat(_animIDSpeed, this.animationBlend);
                 this.animatorRef.SetFloat(_animIDMotionSpeed, inputMagnitude);
             }
         }
@@ -330,7 +342,7 @@ namespace MultiplayerTest
 
             if (Grounded) {
                 // reset the fall timeout timer
-                _fallTimeoutDelta = FallTimeout;
+                this.fallTimeoutDelta = FallTimeout;
 
                 // update animator if using character
                 if (this.hasAnimator) {
@@ -339,14 +351,14 @@ namespace MultiplayerTest
                 }
 
                 // stop our velocity dropping infinitely when grounded
-                if (_verticalVelocity < 0.0f) {
-                    _verticalVelocity = -2f;
+                if (this.verticalVelocity < 0.0f) {
+                    this.verticalVelocity = -2f;
                 }
 
                 // Jump
-                if (this.input.jump && _jumpTimeoutDelta <= 0.0f) {
+                if (this.input.jump && this.jumpTimeoutDelta <= 0.0f) {
                     // the square root of H * -2 * G = how much velocity needed to reach desired height
-                    _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+                    this.verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 
                     // update animator if using character
                     if (this.hasAnimator) {
@@ -355,17 +367,17 @@ namespace MultiplayerTest
                 }
 
                 // jump timeout
-                if (_jumpTimeoutDelta >= 0.0f) {
-                    _jumpTimeoutDelta -= deltaTime;
+                if (this.jumpTimeoutDelta >= 0.0f) {
+                    this.jumpTimeoutDelta -= deltaTime;
                 }
             }
             else {
                 // reset the jump timeout timer
-                _jumpTimeoutDelta = JumpTimeout;
+                this.jumpTimeoutDelta = JumpTimeout;
 
                 // fall timeout
-                if (_fallTimeoutDelta >= 0.0f) {
-                    _fallTimeoutDelta -= deltaTime;
+                if (this.fallTimeoutDelta >= 0.0f) {
+                    this.fallTimeoutDelta -= deltaTime;
                 }
                 else {
                     // update animator if using character
@@ -379,8 +391,8 @@ namespace MultiplayerTest
             }
 
             // apply gravity over time if under terminal (multiply by delta time twice to linearly this.speed up over time)
-            if (_verticalVelocity < _terminalVelocity) {
-                _verticalVelocity += Gravity * deltaTime;
+            if (this.verticalVelocity < this.terminalVelocity) {
+                this.verticalVelocity += Gravity * deltaTime;
             }
         }
 

@@ -1,9 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 using TMPro;
 
+/// <summary>
+/// This class represents the player in the game.
+/// </summary>
 public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 {
     public static NetworkPlayer Local { get; set; }
@@ -29,9 +30,12 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
         networkInGameMessages = GetComponent<NetworkInGameMessages>();
     }
 
+    /// <summary>
+    /// Called when a player is spawned.
+    /// </summary>
     public override void Spawned()
     {
-        if (Object.HasInputAuthority)
+        if (Object.HasInputAuthority) // This is the local player
         {
             Local = this;
 
@@ -40,34 +44,32 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 
             AudioListener audioListener = GetComponentInChildren<AudioListener>(true);
             audioListener.enabled = true;
-            
+
             localCameraHandler.localCamera.enabled = true;
             localCameraHandler.transform.parent = null;
 
             localUI.SetActive(true);
 
             RPC_SetNickName(GameManager.instance.playerNickName);
-
-            Debug.Log("Spawned local player");
         }
-        else
+        else // This is a remote player
         {
-            /* Camera localcamera = GetComponentInChildren<Camera>();
-            Destroy(localcamera.gameObject); */
             localCameraHandler.localCamera.enabled = false;
             localUI.SetActive(false);
 
             AudioListener audioListener = GetComponentInChildren<AudioListener>();
             audioListener.enabled = false;
-
-            Debug.Log("Spawned remote player");
         }
 
         Runner.SetPlayerObject(Object.InputAuthority, Object);
 
-        transform.name = $"P_{Object.Id}";
+        transform.name = $"P_{Object.Id} - {nickName.Value}";
     }
 
+    /// <summary>
+    /// Called when a player leaves the game.
+    /// </summary>
+    /// <param name="player">The player who left the game.</param>
     public void PlayerLeft(PlayerRef player)
     {
         if (Object.HasInputAuthority)
@@ -93,6 +95,11 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
         playerNameText.text = nickName.Value;
     }
 
+    /// <summary>
+    /// Sets the nickname of the player. And sends a message to all players saying the player joined.
+    /// </summary>
+    /// <param name="nickName">The nickname to set.</param>
+    /// <param name="info">The RPC info.</param>
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RPC_SetNickName(string nickName, RpcInfo info = default)
     {

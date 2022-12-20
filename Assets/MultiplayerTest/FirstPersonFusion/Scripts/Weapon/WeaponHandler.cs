@@ -1,9 +1,11 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 using System;
 
+/// <summary>
+/// Handles the weapon logic.
+/// </summary>
 public class WeaponHandler : NetworkBehaviour
 {
     [Networked(OnChanged = nameof(OnFireChanged))]
@@ -38,38 +40,34 @@ public class WeaponHandler : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Makes the player fire.
+    /// </summary>
+    /// <param name="aimForwardVector">Direction of the bullet.</param>
     void Fire(Vector3 aimForwardVector)
     {
         if (Time.time - lastTimeFired < 0.15f)
             return;
-        
+
         Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, 100, Object.InputAuthority, out var hitInfo, collisionLayers, HitOptions.IncludePhysX);
 
         StartCoroutine(FireEffect(aimForwardVector));
 
         float hitDistance = 100;
-        bool isHitOtherPlayer = false;
 
         if (hitInfo.Distance > 0)
             hitDistance = hitInfo.Distance;
-        
-        if (hitInfo.Hitbox != null)
+
+        if (hitInfo.Hitbox != null) // hit a player
         {
             if (Object.HasStateAuthority)
                 hitInfo.Hitbox.transform.root.GetComponent<HPHandler>().OnTakeDamage(networkPlayer.nickName.Value);
-
-            isHitOtherPlayer = true;
         }
-        else if (hitInfo.Collider != null)
+        else if (hitInfo.Collider != null) // hit something else
         {
             Debug.Log($"Hit {hitInfo.Collider.gameObject.name}");
         }
 
-        if (isHitOtherPlayer)
-            Debug.DrawRay(aimPoint.position, aimForwardVector * hitDistance, Color.red, 1f);
-        else
-            Debug.DrawRay(aimPoint.position, aimForwardVector * hitDistance, Color.green, 1f);
-        
         lastTimeFired = Time.time;
     }
 
@@ -83,6 +81,10 @@ public class WeaponHandler : NetworkBehaviour
         isFiring = false;
     }
 
+    /// <summary>
+    /// Called when the player fires.
+    /// </summary>
+    /// <param name="changed">The changed data.</param>
     static void OnFireChanged(Changed<WeaponHandler> changed)
     {
         bool isFiringCurrent = changed.Behaviour.isFiring;
@@ -95,6 +97,9 @@ public class WeaponHandler : NetworkBehaviour
             changed.Behaviour.OnFireRemote();
     }
 
+    /// <summary>
+    /// Called when another player fires.
+    /// </summary>
     void OnFireRemote()
     {
         if (!Object.HasInputAuthority)

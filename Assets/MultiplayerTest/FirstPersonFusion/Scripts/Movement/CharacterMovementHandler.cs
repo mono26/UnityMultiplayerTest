@@ -1,8 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 
+/// <summary>
+/// This class handles the movement of the character.
+/// </summary>
 public class CharacterMovementHandler : NetworkBehaviour
 {
     bool isRespawnedRequested = false;
@@ -10,7 +11,6 @@ public class CharacterMovementHandler : NetworkBehaviour
     NetworkCharacterControllerPrototypeCustom characterController;
     HPHandler hpHandler;
     NetworkMecanimAnimator networkMecanimAnimator;
-    //Camera localCamera;
 
     public float animationSpeed = 2f;
     private int _animIDSpeed;
@@ -18,13 +18,12 @@ public class CharacterMovementHandler : NetworkBehaviour
     private int _animIDJump;
     private int _animIDFreeFall;
     private int _animIDMotionSpeed;
-    
+
     void Awake()
     {
         characterController = GetComponent<NetworkCharacterControllerPrototypeCustom>();
         hpHandler = GetComponent<HPHandler>();
         networkMecanimAnimator = GetComponent<NetworkMecanimAnimator>();
-        //localCamera = GetComponentInChildren<Camera>();
     }
 
     void Start()
@@ -87,11 +86,13 @@ public class CharacterMovementHandler : NetworkBehaviour
         }
     }
 
+    /// <summary> Requests a respawn. </summary>
     public void RequestSpawn()
     {
         isRespawnedRequested = true;
     }
 
+    /// <summary> Respawns the character. </summary>
     void Respawn()
     {
         characterController.TeleportToPosition(Utils.GetRandomSpawnPoint());
@@ -99,7 +100,9 @@ public class CharacterMovementHandler : NetworkBehaviour
         hpHandler.OnRespawned();
         isRespawnedRequested = false;
     }
-    
+
+    /// <summary> Turns the character controller on or off. </summary>
+    /// <param name="enabled"> Bool to enable/disable the character controller. </param>
     public void SetCharacterControllerEnabled(bool enabled)
     {
         characterController.Controller.enabled = enabled;

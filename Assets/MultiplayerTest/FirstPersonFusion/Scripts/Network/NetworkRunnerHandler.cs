@@ -2,12 +2,14 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Fusion;
 using Fusion.Sockets;
 
+/// <summary>
+/// This class is used to initialize and handle the network runner.
+/// </summary>
 public class NetworkRunnerHandler : MonoBehaviour
 {
     public NetworkRunner networkRunnerPrefab;
@@ -137,6 +139,7 @@ public class NetworkRunnerHandler : MonoBehaviour
         var clientTask = JoinLobby();
     }
 
+    /// <summary> Joins a lobby. </summary>
     private async Task JoinLobby()
     {
         string lobbyID = "MyLobby";
@@ -153,11 +156,20 @@ public class NetworkRunnerHandler : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Creates a game; as Host.
+    /// </summary>
+    /// <param name="sessionName">The name of the session.</param>
+    /// <param name="sceneName">The name of the scene.</param>
     public void CreateGame(string sessionName, string sceneName)
     {
         var clientTask = InitializeNetworkRunner(networkRunner, GameMode.Host, GameManager.instance.GetConnectionToken(), sessionName, NetAddress.Any(), SceneManager.GetActiveScene().buildIndex + 1, null);
     }
 
+    /// <summary>
+    /// Joins a game; as Client.
+    /// </summary>
+    /// <param name="sessionInfo">The session info.</param>
     public void JoinGame(SessionInfo sessionInfo)
     {
         var clientTask = InitializeNetworkRunner(networkRunner, GameMode.Client, GameManager.instance.GetConnectionToken(), sessionInfo.Name, NetAddress.Any(), SceneManager.GetActiveScene().buildIndex + 1, null);

@@ -5,6 +5,9 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
+  - enabled: 0
+    path: Assets/Fusion_Features/BasicScene/BasicScene.unity
+    guid: 1bb415d1b6522be4c9e3c3ab094eafcf
   - enabled: 1
     path: Assets/MultiplayerTest/FirstPersonFusion/MainMenu.unity
     guid: 2d0b7676bb06a2a4e8d406bfe852c78b

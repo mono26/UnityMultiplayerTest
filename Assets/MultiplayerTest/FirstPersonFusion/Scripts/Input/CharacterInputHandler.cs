@@ -1,8 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// This script handles the input for the player. It is attached to the player object in the scene.
+/// </summary>
 public class CharacterInputHandler : MonoBehaviour
 {
     Vector2 moveInputVector = Vector2.zero;
@@ -31,6 +32,7 @@ public class CharacterInputHandler : MonoBehaviour
     {
         if (!characterMovementHandler.Object.HasInputAuthority) // Makes sure to run this only on the client been controlled
             return;                                             // by the local player
+
         // Move Input  
         moveInputVector = inputActions.Player.Move.ReadValue<Vector2>();
 
@@ -40,14 +42,17 @@ public class CharacterInputHandler : MonoBehaviour
         // Jump Input
         if (inputActions.Player.Jump.triggered)
             jumpRequest = true;
-        
+
         // Fire Input
         if (inputActions.Player.Fire.triggered)
             fireRequest = true;
-        
+
         localCameraHandler.SetViewInputVector(viewInputVector);
     }
 
+    /// <summary>
+    /// Sets the input values to the network input data struct. This is called in <see cref="Spawner" /> class.
+    /// </summary>
     public NetworkInputData GetNetworkInput()
     {
         NetworkInputData networkInputData = new NetworkInputData();

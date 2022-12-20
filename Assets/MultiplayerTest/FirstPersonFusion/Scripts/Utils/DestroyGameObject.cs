@@ -1,7 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// This class is responsible for destroying the game object after a certain time.
+/// </summary>
 public class DestroyGameObject : MonoBehaviour
 {
     public float lifeTime = 2f;

@@ -7,7 +7,7 @@ namespace MultiplayerTest
     public class GamePlayer : SLGNetworkBehaviour
     {
         private NetworkCharacterControllerPrototype characterController = null;
-        private GameCharacterTransformController characterTransformController = null;
+        private GameTransformController characterTransformController = null;
 
         private GameCharacterInput input = null;
 
@@ -52,7 +52,7 @@ namespace MultiplayerTest
 
             this.input = this.GetComponent<GameCharacterInput>();
             this.characterController = this.GetComponent<NetworkCharacterControllerPrototype>();
-            this.characterTransformController = this.GetComponent<GameCharacterTransformController>();
+            this.characterTransformController = this.GetComponent<GameTransformController>();
         }
     }
 }

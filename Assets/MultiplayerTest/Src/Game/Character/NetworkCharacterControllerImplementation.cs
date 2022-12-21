@@ -24,10 +24,11 @@ namespace MultiplayerTest
 #if GAME_SERVER
             Vector3 previousPos = this.transform.position;
 
-            Controller.Move(direction);
+            this.Controller.Move(direction);
 
-            Velocity = (this.transform.position - previousPos) * Runner.Simulation.Config.TickRate;
-            IsGrounded = this.characterController.Grounded;
+            this.Velocity = (this.transform.position - previousPos) * Runner.Simulation.Config.TickRate;
+            // this.Velocity = this.Controller.velocity;
+            this.IsGrounded = this.characterController.Grounded;
 #endif
         }
     }

@@ -99,6 +99,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 6475367346581292436}
   - {fileID: 4659641404641285520}
+  - {fileID: -7546014999294585409}
   - {fileID: -4355428879493886078}
   SimulationBehaviours: []
 --- !u!114 &6475367346581292436
@@ -162,10 +163,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbe1caf0c99d2ff4d8d803c2301c2e68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   MoveSpeed: 2
-  SprintSpeed: 5.335
+  SprintSpeed: 6
   RotationSmoothTime: 0.12
   SpeedChangeRate: 10
+  FootstepAudioVolume: 0.5
   LandingAudioClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
   FootstepAudioClips:
   - {fileID: 8300000, guid: 72f526a6a9890f643a88e85a61c86c8a, type: 3}
@@ -178,7 +181,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 67c8b33e424ccdc4486edf538ab91c5a, type: 3}
   - {fileID: 8300000, guid: 274649b0e221539409070ebf6c18918b, type: 3}
   - {fileID: 8300000, guid: a3194b8bbc96ef84fab1f98f4b7dae3e, type: 3}
-  FootstepAudioVolume: 0.5
   JumpHeight: 1.2
   Gravity: -15
   JumpTimeout: 0.5

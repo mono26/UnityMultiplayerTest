@@ -8,9 +8,9 @@ using UnityEngine;
 
 namespace MultiplayerTest
 {
-    public class GameCharacterTransformController : SLGBehaviour
+    public class GameTransformController : SLGBehaviour
     {
-        [Header("Player")][Tooltip("Move this.speed of the character in m/s")]
+        [Header("Player")][Tooltip("Move speed of the transform in m/s")]
         [SerializeField]
         private float MoveSpeed = 2.0f;
 

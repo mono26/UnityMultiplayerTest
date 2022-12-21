@@ -46,9 +46,11 @@ namespace MultiplayerTest
 
 #if GAME_SERVER
             // Limit frame rate in server.
-            Application.targetFrameRate = 30;
+            Application.targetFrameRate = 60;
             this.gameServerFactory = new PFBFactory<GameServer>();
 #elif GAME_CLIENT
+            // Limit frame rate in client.
+            Application.targetFrameRate = 60;
             this.gameClientFactory = new PFBFactory<GameClient>();
 #endif
         }

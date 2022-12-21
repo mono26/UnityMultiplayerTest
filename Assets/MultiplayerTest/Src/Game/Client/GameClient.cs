@@ -26,9 +26,9 @@ namespace MultiplayerTest
         private GameRunner gameRunner = null;
         private PFBFactory<GameRunner> gameRunnerFactory = null;
 
-        private NetworkRunner networkRunner = null;
-
         private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+
+        public NetworkRunner NetworkRunner { get; private set; } = null;
 
         private void Awake()
         {
@@ -50,11 +50,15 @@ namespace MultiplayerTest
 
             base.OnInitialize();
 
-            if (!this.TryGetComponent<NetworkRunner>(out this.networkRunner)) {
-                this.networkRunner = this.gameObject.AddComponent<NetworkRunner>();
+            NetworkRunner runner = null;
+            if (!this.TryGetComponent<NetworkRunner>(out runner)) {
+                runner = this.gameObject.AddComponent<NetworkRunner>();
             }
-            this.networkRunner.ProvideInput = true;
-            this.networkRunner.AddCallbacks(this);
+
+            this.NetworkRunner = runner;
+
+            this.NetworkRunner.ProvideInput = true;
+            this.NetworkRunner.AddCallbacks(this);
 
             this.gameRunnerFactory = new PFBFactory<GameRunner>();
 
@@ -70,7 +74,7 @@ namespace MultiplayerTest
         {
             Debug.Log("OnPlayerLeft");
 
-            if (this.networkRunner != runner) {
+            if (this.NetworkRunner != runner) {
                 return;
             }
 
@@ -81,11 +85,11 @@ namespace MultiplayerTest
 
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
-            if (this.networkRunner != runner) {
+            if (this.NetworkRunner != runner) {
                 return;
             }
 
-            if (!this.spawnedCharacters.TryGetValue(this.networkRunner.LocalPlayer, out NetworkObject localPlayerObject)) {
+            if (!this.spawnedCharacters.TryGetValue(this.NetworkRunner.LocalPlayer, out NetworkObject localPlayerObject)) {
                 return;
             }
 
@@ -202,7 +206,7 @@ namespace MultiplayerTest
 
             Log.Info($"Attempting to join server at {address} and with config: {this.serverConfig}.");
 
-            StartGameResult result = await this.networkRunner.StartGame(new StartGameArgs() {
+            StartGameResult result = await this.NetworkRunner.StartGame(new StartGameArgs() {
                 GameMode = GameMode.Client,
                 SessionName = this.serverConfig.SessionName,
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),

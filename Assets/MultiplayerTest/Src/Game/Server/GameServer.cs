@@ -55,7 +55,7 @@ namespace MultiplayerTest
 
             this.NetworkRunner = runner;
 
-            this.NetworkRunner.ProvideInput = true;
+            this.NetworkRunner.ProvideInput = false;
             this.NetworkRunner.AddCallbacks(this);
 
             this.gameRunnerFactory = new PFBFactory<GameRunner>();

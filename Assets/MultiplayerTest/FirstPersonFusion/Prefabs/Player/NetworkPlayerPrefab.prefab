@@ -1405,6 +1405,7 @@ MonoBehaviour:
     _length: 0
     _data:
       Data: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  _token: 0
   localCameraHandler: {fileID: 4691130831132868658}
   localUI: {fileID: 6349531720272167780}
 --- !u!114 &2558441330356799330
@@ -1507,6 +1508,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   animationSpeed: 1.5
+  FootstepAudioClips:
+  - {fileID: 8300000, guid: 72f526a6a9890f643a88e85a61c86c8a, type: 3}
+  - {fileID: 8300000, guid: 85016e0f2b01da248b9663dd49a161b0, type: 3}
+  - {fileID: 8300000, guid: 186de84b3207156479abe98f4958fed0, type: 3}
+  - {fileID: 8300000, guid: 1a91fcd19acf1e54bba0945d9f390849, type: 3}
+  - {fileID: 8300000, guid: 14e8a8d2158bec840b56c54f5266e692, type: 3}
+  - {fileID: 8300000, guid: 29841e7d5bbfb5b419c9ad16ca8bc4c1, type: 3}
+  - {fileID: 8300000, guid: dd1af302b8902684d9381de1f2d3a5af, type: 3}
+  - {fileID: 8300000, guid: 67c8b33e424ccdc4486edf538ab91c5a, type: 3}
+  - {fileID: 8300000, guid: 274649b0e221539409070ebf6c18918b, type: 3}
+  - {fileID: 8300000, guid: a3194b8bbc96ef84fab1f98f4b7dae3e, type: 3}
+  LandingAudioClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
+  FootstepAudioVolume: 0.5
 --- !u!114 &3295905030881217790
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1519,6 +1533,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55ff7e24d61553040bc0f490e491540a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pauseMenu: {fileID: 33244592816291582}
 --- !u!95 &2536116216153604383
 Animator:
   serializedVersion: 4
@@ -1627,6 +1642,7 @@ MonoBehaviour:
   playerModel: {fileID: 8061309886304470127}
   deathGameObjectPrefab: {fileID: 6723322315633031409, guid: 5958da3e6596b6c43a67dc2d1d5449aa,
     type: 3}
+  skipSettingStartValues: 0
 --- !u!114 &4847388062626975138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3084,6 +3100,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraAnchorPoint: {fileID: 594956951836829214}
+  localCamera: {fileID: 0}
 --- !u!1 &8807135258996646772
 GameObject:
   m_ObjectHideFlags: 0
@@ -8060,21 +8077,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerUICanvas
       objectReference: {fileID: 0}
-    - target: {fileID: 5469569518135718740, guid: 6e0f0c2a9e9530543ba065250d7cddff,
-        type: 3}
-      propertyPath: m_Color.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5469569518135718740, guid: 6e0f0c2a9e9530543ba065250d7cddff,
-        type: 3}
-      propertyPath: m_Color.g
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5469569518135718740, guid: 6e0f0c2a9e9530543ba065250d7cddff,
-        type: 3}
-      propertyPath: m_Color.r
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6336675167488222440, guid: 6e0f0c2a9e9530543ba065250d7cddff,
         type: 3}
       propertyPath: m_Pivot.x
@@ -8242,6 +8244,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6e0f0c2a9e9530543ba065250d7cddff, type: 3}
+--- !u!1 &33244592816291582 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5119972618611623205, guid: 6e0f0c2a9e9530543ba065250d7cddff,
+    type: 3}
+  m_PrefabInstance: {fileID: 5150939570943491035}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1192244723653959475 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6336675167488222440, guid: 6e0f0c2a9e9530543ba065250d7cddff,

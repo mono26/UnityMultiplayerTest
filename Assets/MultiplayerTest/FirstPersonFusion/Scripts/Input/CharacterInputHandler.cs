@@ -33,6 +33,17 @@ public class CharacterInputHandler : MonoBehaviour
         if (!characterMovementHandler.Object.HasInputAuthority) // Makes sure to run this only on the client been controlled
             return;                                             // by the local player
 
+        if (inputActions.Player.Scape.triggered && Cursor.lockState == CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else if (inputActions.Player.Scape.triggered && Cursor.lockState == CursorLockMode.None)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
         // Move Input  
         moveInputVector = inputActions.Player.Move.ReadValue<Vector2>();
 

@@ -19,6 +19,10 @@ public class CharacterMovementHandler : NetworkBehaviour
     private int _animIDFreeFall;
     private int _animIDMotionSpeed;
 
+    public AudioClip[] FootstepAudioClips;
+    public AudioClip LandingAudioClip;
+    [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
+
     void Awake()
     {
         characterController = GetComponent<NetworkCharacterControllerPrototypeCustom>();
@@ -107,4 +111,24 @@ public class CharacterMovementHandler : NetworkBehaviour
     {
         characterController.Controller.enabled = enabled;
     }
+
+    private void OnFootstep(AnimationEvent animationEvent)
+        {
+            if (animationEvent.animatorClipInfo.weight > 0.5f)
+            {
+                if (FootstepAudioClips.Length > 0)
+                {
+                    var index = Random.Range(0, FootstepAudioClips.Length);
+                    AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(characterController.GetComponent<CharacterController>().center), FootstepAudioVolume);
+                }
+            }
+        }
+
+        private void OnLand(AnimationEvent animationEvent)
+        {
+            if (animationEvent.animatorClipInfo.weight > 0.5f)
+            {
+                AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(characterController.GetComponent<CharacterController>().center), FootstepAudioVolume);
+            }
+        }
 }

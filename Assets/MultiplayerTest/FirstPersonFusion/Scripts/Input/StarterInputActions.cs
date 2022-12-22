@@ -71,6 +71,15 @@ public partial class @StarterInputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Scape"",
+                    ""type"": ""Button"",
+                    ""id"": ""e9fdaa7d-bca1-4d64-bfc6-732f83d0f100"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -186,22 +195,22 @@ public partial class @StarterInputActions : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""ed66cbff-2900-4a62-8896-696503cfcd31"",
-                    ""path"": ""<Pointer>/delta"",
+                    ""id"": ""d1d171b6-19d8-47a6-ba3a-71b6a8e7b3c0"",
+                    ""path"": ""<Gamepad>/rightStick"",
                     ""interactions"": """",
-                    ""processors"": ""InvertVector2(invertX=false),ScaleVector2(x=0.05,y=0.05)"",
-                    ""groups"": ""KeyboardMouse"",
+                    ""processors"": ""InvertVector2(invertX=false),StickDeadzone,ScaleVector2(x=2)"",
+                    ""groups"": ""Gamepad"",
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""d1d171b6-19d8-47a6-ba3a-71b6a8e7b3c0"",
-                    ""path"": ""<Gamepad>/rightStick"",
+                    ""id"": ""4307ad27-3cdf-418c-a0c6-1542c76d7de0"",
+                    ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",
-                    ""processors"": ""InvertVector2(invertX=false),StickDeadzone,ScaleVector2(x=300,y=300)"",
-                    ""groups"": ""Gamepad"",
+                    ""processors"": ""InvertVector2(invertX=false),ScaleVector2(x=0.05,y=0.05)"",
+                    ""groups"": """",
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -258,6 +267,28 @@ public partial class @StarterInputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""KeyboardMouse"",
                     ""action"": ""Fire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6bd53c1d-0c99-43c0-96eb-0bd8c5210c07"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""Scape"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""08665407-c598-42ab-ba2a-af0d92d16d8a"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Scape"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -321,6 +352,7 @@ public partial class @StarterInputActions : IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
+        m_Player_Scape = m_Player.FindAction("Scape", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -385,6 +417,7 @@ public partial class @StarterInputActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Fire;
+    private readonly InputAction m_Player_Scape;
     public struct PlayerActions
     {
         private @StarterInputActions m_Wrapper;
@@ -394,6 +427,7 @@ public partial class @StarterInputActions : IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         public InputAction @Fire => m_Wrapper.m_Player_Fire;
+        public InputAction @Scape => m_Wrapper.m_Player_Scape;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -418,6 +452,9 @@ public partial class @StarterInputActions : IInputActionCollection2, IDisposable
                 @Fire.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFire;
                 @Fire.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFire;
                 @Fire.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFire;
+                @Scape.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnScape;
+                @Scape.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnScape;
+                @Scape.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnScape;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -437,6 +474,9 @@ public partial class @StarterInputActions : IInputActionCollection2, IDisposable
                 @Fire.started += instance.OnFire;
                 @Fire.performed += instance.OnFire;
                 @Fire.canceled += instance.OnFire;
+                @Scape.started += instance.OnScape;
+                @Scape.performed += instance.OnScape;
+                @Scape.canceled += instance.OnScape;
             }
         }
     }
@@ -484,5 +524,6 @@ public partial class @StarterInputActions : IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
         void OnFire(InputAction.CallbackContext context);
+        void OnScape(InputAction.CallbackContext context);
     }
 }

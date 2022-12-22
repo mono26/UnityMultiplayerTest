@@ -154,7 +154,6 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnDisconnectedFromServer(NetworkRunner runner) {}
 
-
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) {}
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {}

@@ -1,9 +1,9 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Fusion;
 using Fusion.Sockets;
-using System;
 
 public class Sample_Spawner : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -77,6 +77,23 @@ public class Sample_Spawner : MonoBehaviour, INetworkRunnerCallbacks
             _spawnedPlayers.Remove(player);
         }
     }
+
+    public void OnInput(NetworkRunner runner, NetworkInput input)
+    {
+        var data = new Sample_NetworkInputData();
+
+        if (Input.GetKey(KeyCode.W))
+            data.direction += Vector3.forward;
+        if (Input.GetKey(KeyCode.S))
+            data.direction += Vector3.back;
+        if (Input.GetKey(KeyCode.A))
+            data.direction += Vector3.left;
+        if (Input.GetKey(KeyCode.D))
+            data.direction += Vector3.right;
+
+        input.Set(data);
+    }
+
 #region Unused callbacks
     public void OnConnectedToServer(NetworkRunner runner) { }
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
@@ -84,7 +101,6 @@ public class Sample_Spawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnDisconnectedFromServer(NetworkRunner runner) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-    public void OnInput(NetworkRunner runner, NetworkInput input) { }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
     public void OnSceneLoadDone(NetworkRunner runner) { }

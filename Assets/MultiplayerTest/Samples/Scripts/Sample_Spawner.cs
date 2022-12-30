@@ -14,6 +14,8 @@ public class Sample_Spawner : MonoBehaviour, INetworkRunnerCallbacks
     /// <summary> List of spawned players. </summary>
     private Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new Dictionary<PlayerRef, NetworkObject>();
 
+    Sample_InputHandler _inputHandler;
+
     /// <summary> Starts a game with the specified mode: <br />
     /// <see langword ="GameMode.Server"/>, <see langword ="GameMode.Host" />, <see langword ="GameMode.Client" />.</summary>
     /// <param name="mode">Game mode to start (<b>Server</b>, <b>Host</b> or <b>Client</b>).</param>
@@ -80,18 +82,10 @@ public class Sample_Spawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        var data = new Sample_NetworkInputData();
+        _inputHandler = runner.gameObject.GetComponent<Sample_InputHandler>() ?? runner.gameObject.AddComponent<Sample_InputHandler>();
 
-        if (Input.GetKey(KeyCode.W))
-            data.direction += Vector3.forward;
-        if (Input.GetKey(KeyCode.S))
-            data.direction += Vector3.back;
-        if (Input.GetKey(KeyCode.A))
-            data.direction += Vector3.left;
-        if (Input.GetKey(KeyCode.D))
-            data.direction += Vector3.right;
-
-        input.Set(data);
+        if (_inputHandler != null)
+            input.Set(_inputHandler.GetNetworkInputData());
     }
 
 #region Unused callbacks

@@ -211,3 +211,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _ballPrefab: {fileID: 7431132685858236071, guid: 69676df26c27ad44398c373514f328b6,
+    type: 3}

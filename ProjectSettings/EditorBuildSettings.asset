@@ -8,9 +8,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/MultiplayerTest/Samples/1-Spawner/Spawner.unity
     guid: 1da3d1d06f6680b418458b03a7f8e4b7
-  - enabled: 1
+  - enabled: 0
     path: Assets/MultiplayerTest/Samples/2-Collect_Input/CollectInput.unity
     guid: d10c9448137c9984491f47639e2f17ac
+  - enabled: 1
+    path: Assets/MultiplayerTest/Samples/4-Matchmaking/Matchmaking.unity
+    guid: ee05f6e2ceb29a645b6a6c15d7432353
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000

@@ -1,8 +1,12 @@
 using UnityEngine;
 using Fusion;
 
+/// <summary>
+/// Object used as a projectile.
+/// </summary>
 public class Sample_Ball : NetworkBehaviour
 {
+    /// <summary> Timer used to destroy the object after a certain amount of time. </summary>
     [Networked] private TickTimer life { get; set; }
 
     public void Init()

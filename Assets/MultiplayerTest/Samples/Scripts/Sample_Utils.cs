@@ -1,7 +1,10 @@
 using UnityEngine;
 
+/// <summary>
+/// Uility class used to store filters for matchmaking.
 public class Sample_Utils
 {
+    /// <summary> Enum used to store the different game types. </summary>
     public enum GameType : int
     {
         TeamDeathMatch = 0,
@@ -11,6 +14,7 @@ public class Sample_Utils
         KingOfTheHill = 4
     }
 
+    /// <summary> Enum used to store the different maps. </summary>
     public enum GameMap : int
     {
         City = 0,

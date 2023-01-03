@@ -6,6 +6,9 @@ using Fusion;
 using Fusion.Sockets;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Handles the matchmaking and spawning of players.
+/// </summary>
 public class Sample_Matchmaking_Spawner : MonoBehaviour, INetworkRunnerCallbacks
 {
     /// <summary> Represents a Server or Client Simulation. </summary>
@@ -14,6 +17,9 @@ public class Sample_Matchmaking_Spawner : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private NetworkPrefabRef _playerPrefab;
     /// <summary> List of spawned players. </summary>
     private Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new Dictionary<PlayerRef, NetworkObject>();
+
+    public string GameType;
+    public string GameMap;
 
     Sample_InputHandler _inputHandler;
 
@@ -38,6 +44,9 @@ public class Sample_Matchmaking_Spawner : MonoBehaviour, INetworkRunnerCallbacks
                               ? Enum.GetName(typeof(Sample_Utils.GameType), _runner.SessionInfo.Properties["GameType"].PropertyValue)
                               : "Unknown";
             Debug.Log($"Game started \n \t Map: {gameMap} \t GameType: {gameType}");
+
+            GameType = gameType;
+            GameMap = gameMap;
         }
         else
             Debug.Log($"Game start failed: {result.ShutdownReason}");
@@ -46,12 +55,14 @@ public class Sample_Matchmaking_Spawner : MonoBehaviour, INetworkRunnerCallbacks
     /// <summary> Creates a new session with custom properties. </summary>
     /// <param name="map">Map to play on.</param>
     /// <param name="gameType">Game type to play.</param>
-    public async Task CreateSessionWithCustomProperties(Sample_Utils.GameMap map, Sample_Utils.GameType gameType)
+    public async Task CreateSessionWithCustomProperties(Sample_Utils.GameMap map, Sample_Utils.GameType gameType, SceneRef scene)
     {
         Dictionary<string, SessionProperty> customProperties = new Dictionary<string, SessionProperty>();
-
         customProperties["Map"] = (int)map;
         customProperties["GameType"] = (int)gameType;
+
+        GameMap = map.ToString();
+        GameType = gameType.ToString();
 
         _runner = gameObject.GetComponent<NetworkRunner>() ?? gameObject.AddComponent<NetworkRunner>();
         _runner.ProvideInput = true;
@@ -60,11 +71,14 @@ public class Sample_Matchmaking_Spawner : MonoBehaviour, INetworkRunnerCallbacks
         {
             GameMode = GameMode.AutoHostOrClient,
             SessionProperties = customProperties,
+            Scene = scene,
             SceneManager = gameObject.GetComponent<NetworkSceneManagerDefault>() ?? gameObject.AddComponent<NetworkSceneManagerDefault>(),
         });
 
         if (result.Ok)
+        {
             Debug.Log($"Custom Game started:\n \t Map: {map} \t GameType: {gameType}");
+        }
         else
             Debug.Log($"Game start failed: {result.ShutdownReason}");
     }
@@ -73,14 +87,14 @@ public class Sample_Matchmaking_Spawner : MonoBehaviour, INetworkRunnerCallbacks
     public async Task LeaveSession()
     {
         await _runner.Shutdown();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene(0);
     }
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         if (runner.IsServer)
         {
-            Vector3 spawnPos= new Vector3((player.RawEncoded%runner.Config.Simulation.DefaultPlayers) * 3, 1, 0);
+            Vector3 spawnPos = new Vector3((player.RawEncoded%runner.Config.Simulation.DefaultPlayers) * 3, 1, 0);
             NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPos, Quaternion.identity, player);
 
             _spawnedPlayers.Add(player, networkPlayerObject);

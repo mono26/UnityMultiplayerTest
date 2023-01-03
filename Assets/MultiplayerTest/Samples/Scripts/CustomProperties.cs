@@ -3,9 +3,14 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
+/// <summary>
+/// This class is used to set the filters for matchmaking.
+/// </summary>
 public class CustomProperties : MonoBehaviour
 {
+    /// <summary> Maps available for matchmaking </summary>
     public TMP_Dropdown mapDropdown;
+    /// <summary> Game types available for matchmaking </summary>
     public TMP_Dropdown gameTypeDropdown;
 
     private void Start()

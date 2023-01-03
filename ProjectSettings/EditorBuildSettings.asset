@@ -11,9 +11,27 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/MultiplayerTest/Samples/2-Collect_Input/CollectInput.unity
     guid: d10c9448137c9984491f47639e2f17ac
-  - enabled: 1
+  - enabled: 0
     path: Assets/MultiplayerTest/Samples/4-Matchmaking/Matchmaking.unity
     guid: ee05f6e2ceb29a645b6a6c15d7432353
+  - enabled: 1
+    path: Assets/MultiplayerTest/Samples/5-SceneLoading/0-SceneLoading.unity
+    guid: 3cc7e8e015c797a4d8ade485aba47188
+  - enabled: 1
+    path: Assets/MultiplayerTest/Samples/5-SceneLoading/1-TDM.unity
+    guid: 292ca2634306d134b9ce87fb8948b3f1
+  - enabled: 1
+    path: Assets/MultiplayerTest/Samples/5-SceneLoading/2-CTF.unity
+    guid: 06c565b315b44594e918c2045eabc2d2
+  - enabled: 1
+    path: Assets/MultiplayerTest/Samples/5-SceneLoading/3-Deathmatch.unity
+    guid: ef1d30f3623a69245a1695cef2f54793
+  - enabled: 1
+    path: Assets/MultiplayerTest/Samples/5-SceneLoading/4-FreeForAll.unity
+    guid: d784d7366fe4bce49be85c292975c040
+  - enabled: 1
+    path: Assets/MultiplayerTest/Samples/5-SceneLoading/5-KingOfTheHill.unity
+    guid: 48ea00470be1f5a459913db3a62740b1
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
